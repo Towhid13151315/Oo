@@ -1,426 +1,1101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Earning Hub - Admin Panel</title>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Osmania Royal Biryani - Premium Food Delivery</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Hind Siliguri Font (Bengali Support) -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- html2canvas for Receipt Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
+        * {
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+        
+        /* Custom Color Palette */
         :root {
-            --primary: #5b7fff;
-            --dark: #0a0e1a;
-            --card: #161b2c;
-            --text: #f8fafc;
+            --primary-red: #900C3F;
+            --secondary-gold: #FFC300;
+            --dark-bg: #1a1a1a;
+            --light-bg: #f8f8f8;
         }
-        * { box-sizing: border-box; margin:0; padding:0; }
-        body {
-            background: var(--dark);
-            color: var(--text);
-            font-family: 'Inter', system-ui, sans-serif;
-            line-height: 1.5;
-            overflow-x: hidden;
+        
+        /* Premium Animations */
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
-        .topbar {
-            background: #111827;
-            padding: 15px 20px;
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 195, 0, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(255, 195, 0, 0); }
+        }
+        
+        @keyframes zoom-in {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+        
+        @keyframes badge-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Glassmorphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Product Image Container */
+        .product-image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            aspect-ratio: 1;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .product-image-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .product-image-container:hover .product-image {
+            transform: scale(1.08);
+        }
+        
+        /* Premium Badges */
+        .badge {
+            position: absolute;
+            backdrop-filter: blur(8px);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #334155;
+            gap: 4px;
+            z-index: 10;
+            animation: fadeIn 0.5s ease;
         }
-        .sidebar {
-            position: fixed;
-            left: -280px;
-            top: 0;
-            width: 280px;
-            height: 100vh;
-            background: #111827;
-            padding: 20px;
-            transition: all 0.3s ease;
-            z-index: 1100;
-            overflow-y: auto;
+        
+        .badge-premium {
+            top: 12px;
+            left: 12px;
+            background: rgba(144, 12, 63, 0.9);
+            color: #FFC300;
+            padding: 6px 10px;
+            border: 1px solid #FFC300;
         }
-        .sidebar.open { left: 0; }
-        .overlay {
+        
+        .badge-bestseller {
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 195, 0, 0.95);
+            color: #900C3F;
+            padding: 6px 10px;
+            border: 1px solid #900C3F;
+            animation: pulse-glow 2s infinite;
+        }
+        
+        .badge-special {
+            bottom: 12px;
+            left: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #900C3F;
+            padding: 6px 10px;
+            border: 1px solid #900C3F;
+        }
+        
+        .badge-new {
+            top: 12px;
+            right: 12px;
+            background: rgba(220, 38, 38, 0.95);
+            color: white;
+            padding: 6px 10px;
+            animation: bounce 0.6s ease-in-out infinite;
+        }
+        
+        /* Image Gradient Overlay */
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(144, 12, 63, 0) 0%, rgba(144, 12, 63, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .product-image-container:hover .image-overlay {
+            opacity: 1;
+        }
+        
+        /* Bottom Sheet Cart */
+        .bottom-sheet {
             position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 1050;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 24px 24px 0 0;
+            max-width: 480px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 40;
+            animation: slideUp 0.4s ease;
             display: none;
         }
-        .overlay.show { display: block; }
-        .nav-link {
-            padding: 14px 16px;
-            color: #94a3b8;
+        
+        .bottom-sheet.active {
+            display: block;
+        }
+        
+        /* Mobile Container */
+        .mobile-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #900C3F 0%, #6b0a2f 100%);
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 20px rgba(144, 12, 63, 0.2);
+        }
+        
+        /* Search Bar */
+        .search-bar {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #FFC300;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 14px;
+            color: #333;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 195, 0, 0.2);
+            border-color: #900C3F;
+        }
+        
+        /* Category Slider */
+        .category-slider {
+            display: flex;
+            gap: 10px;
+            padding: 16px 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .category-btn {
+            padding: 10px 20px;
+            border-radius: 24px;
+            border: 2px solid #900C3F;
+            background: white;
+            color: #900C3F;
+            font-weight: 600;
+            font-size: 14px;
             cursor: pointer;
-            border-radius: 10px;
-            margin-bottom: 8px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .category-btn.active {
+            background: #900C3F;
+            color: white;
+            box-shadow: 0 4px 12px rgba(144, 12, 63, 0.3);
+        }
+        
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 20px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .product-card:hover {
+            border-color: #FFC300;
+            box-shadow: 0 8px 24px rgba(255, 195, 0, 0.15);
+        }
+        
+        /* Variant Selector */
+        .variant-selector {
+            background: #f8f8f8;
+            border-radius: 8px;
+            padding: 8px;
+            margin: 10px 0;
+        }
+        
+        .variant-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .variant-select:focus {
+            outline: none;
+            border-color: #900C3F;
+            box-shadow: 0 0 0 2px rgba(144, 12, 63, 0.1);
+        }
+        
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 420px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: #900C3F;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #6b0a2f;
+            box-shadow: 0 4px 12px rgba(144, 12, 63, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #FFC300;
+            color: #900C3F;
+        }
+        
+        .btn-secondary:hover {
+            background: #FFB300;
+            box-shadow: 0 4px 12px rgba(255, 195, 0, 0.3);
+        }
+        
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+            width: auto;
+        }
+        
+        /* Quantity Controls */
+        .quantity-control {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 15px;
-        }
-        .nav-link.active, .nav-link:hover {
-            background: #1e2937;
-            color: white;
-        }
-        .main-content {
-            padding: 20px;
-            margin-top: 60px;
-        }
-        .card {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 15px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--card);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 14px 12px;
-            text-align: left;
-            border-bottom: 1px solid #334155;
-            font-size: 14px;
-        }
-        th {
-            background: #1e2937;
-            font-weight: 600;
-        }
-        .table-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-        .btn {
-            padding: 10px 16px;
-            border: none;
+            gap: 8px;
+            background: #f0f0f0;
             border-radius: 8px;
+            padding: 4px;
+            width: fit-content;
+        }
+        
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: white;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 14px;
-            transition: 0.2s;
+            color: #900C3F;
+            transition: all 0.2s ease;
         }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-sm { padding: 6px 12px; font-size: 13px; }
-        input, select {
-            background: #1e2937;
-            border: 1px solid #334155;
+        
+        .qty-btn:hover {
+            background: #900C3F;
             color: white;
-            padding: 12px;
-            border-radius: 8px;
-            width: 100%;
-            font-size: 15px;
         }
-        .section { display: none; }
-        .section.active { display: block; }
-        .hamburger { font-size: 28px; cursor: pointer; }
-        @media (min-width: 768px) {
-            .sidebar { left: 0; }
-            .main-content { margin-left: 280px; margin-top: 0; }
-            .topbar { display: none; }
-            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        
+        /* Badge Animation */
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #900C3F;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b0a2f;
         }
     </style>
 </head>
-<body>
-
-    <!-- Top Bar (Mobile Only) -->
-    <div class="topbar">
-        <div style="display:flex; align-items:center; gap:12px;">
-            <span class="hamburger" onclick="toggleSidebar()">☰</span>
-            <h2 style="color:#5b7fff; font-size:20px;">Earning Hub</h2>
+<body style="margin: 0; padding: 0; background: #f0f0f0;">
+    <div class="mobile-container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2">
+                    <span style="font-size: 28px;">🥘</span>
+                    <div>
+                        <h1 style="margin: 0; font-size: 20px; font-weight: 700;">Osmania Royal</h1>
+                        <p style="margin: 0; font-size: 12px; opacity: 0.9;">Chattogram's Finest</p>
+                    </div>
+                </div>
+                <button id="admin-btn" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 600;">ADMIN</button>
+            </div>
+            <input type="text" id="search-input" class="search-bar" placeholder="🔍 Search biryani...">
         </div>
-        <div onclick="logout()" style="color:#ef4444; font-size:18px;"><i class="fas fa-sign-out-alt"></i></div>
+        
+        <!-- CATEGORY SLIDER -->
+        <div class="category-slider" id="category-slider"></div>
+        
+        <!-- MAIN CONTENT -->
+        <div id="main-content" style="padding-bottom: 100px;">
+            <div class="product-grid" id="product-grid"></div>
+        </div>
+        
+        <!-- FLOATING CART BUTTON -->
+        <div id="cart-btn" style="position: fixed; bottom: 30px; right: 20px; max-width: 480px; right: calc((100vw - 480px) / 2 + 20px); background: #900C3F; color: white; padding: 14px 20px; border-radius: 50px; border: none; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 8px 24px rgba(144, 12, 63, 0.4); z-index: 30; display: none; animation: slideUp 0.4s ease;" onclick="toggleCart()">
+            <span id="cart-count">0</span> 🛒 View Cart
+        </div>
+        
+        <!-- BOTTOM SHEET CART -->
+        <div class="bottom-sheet" id="cart-sheet" style="height: auto; max-height: 70vh; overflow-y: auto;">
+            <div style="padding: 20px; border-bottom: 1px solid #e0e0e0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0; font-size: 18px; font-weight: 700;">Your Cart</h2>
+                    <button onclick="closeCart()" style="background: #f0f0f0; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">✕</button>
+                </div>
+            </div>
+            
+            <div id="cart-items" style="padding: 16px;"></div>
+            
+            <div style="padding: 16px; border-top: 2px solid #e0e0e0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">৳0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 16px; font-weight: 700;">
+                    <span>Grand Total:</span>
+                    <span id="grand-total" style="color: #900C3F; font-size: 18px;">৳0</span>
+                </div>
+                <button class="btn btn-primary" onclick="proceedCheckout()">Proceed to Checkout 💳</button>
+            </div>
+        </div>
     </div>
-
-    <!-- Overlay -->
-    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div style="text-align:center; margin-bottom:30px;">
-            <h2 style="color:#5b7fff;">EARNING HUB</h2>
-            <p style="font-size:12px; color:#64748b;">Admin Panel</p>
-        </div>
-        <div class="nav-link active" onclick="showSection('dashboard', this)"><i class="fas fa-chart-bar"></i> Dashboard</div>
-        <div class="nav-link" onclick="showSection('users', this)"><i class="fas fa-users"></i> Users</div>
-        <div class="nav-link" onclick="showSection('withdrawals', this)"><i class="fas fa-money-bill-wave"></i> Withdrawals</div>
-        <div class="nav-link" onclick="showSection('videos', this)"><i class="fas fa-video"></i> Video Tasks</div>
-        <div class="nav-link" onclick="showSection('settings', this)"><i class="fas fa-cog"></i> Settings</div>
-
-        <div style="position:absolute; bottom:30px; width:240px;">
-            <button class="btn btn-danger" style="width:100%;" onclick="logout()">Logout</button>
+    
+    <!-- CHECKOUT MODAL -->
+    <div class="modal-overlay" id="checkout-modal">
+        <div class="modal">
+            <h2 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 700; text-align: center;">Choose Payment Method</h2>
+            
+            <!-- COD -->
+            <div style="background: #f8f8f8; border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="selectPaymentMethod('cod')">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <input type="radio" name="payment" id="cod-radio" value="cod">
+                    <label for="cod-radio" style="flex: 1; cursor: pointer; margin: 0;">
+                        <div style="font-weight: 600; margin-bottom: 4px;">💵 Cash on Delivery</div>
+                        <div style="font-size: 12px; color: #666;">Pay when your order arrives</div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- bKash/Nagad -->
+            <div style="background: #f8f8f8; border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="selectPaymentMethod('mobile')">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <input type="radio" name="payment" id="mobile-radio" value="mobile">
+                    <label for="mobile-radio" style="flex: 1; cursor: pointer; margin: 0;">
+                        <div style="font-weight: 600; margin-bottom: 4px;">📱 Mobile Banking (bKash/Nagad)</div>
+                        <div style="font-size: 12px; color: #666;">Quick & Secure Payment</div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Card Payment -->
+            <div style="background: #f8f8f8; border-radius: 12px; padding: 16px; margin-bottom: 20px; cursor: pointer; transition: all 0.3s ease;" onclick="selectPaymentMethod('card')">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <input type="radio" name="payment" id="card-radio" value="card">
+                    <label for="card-radio" style="flex: 1; cursor: pointer; margin: 0;">
+                        <div style="font-weight: 600; margin-bottom: 4px;">💳 Card Payment</div>
+                        <div style="font-size: 12px; color: #666;">Visa, Mastercard, etc.</div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Payment Details Form (Dynamic) -->
+            <div id="payment-details"></div>
+            
+            <button class="btn btn-primary" onclick="processPayment()">Confirm Payment 💰</button>
+            <button class="btn" style="background: #e0e0e0; color: #333; margin-top: 10px;" onclick="closeCheckout()">Cancel</button>
         </div>
     </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-
-        <!-- Dashboard -->
-        <div id="dashboard" class="section active">
-            <h1 style="margin-bottom:20px; font-size:24px;">Dashboard</h1>
-            <div class="stats-grid">
-                <div class="card"><h4>Total Users</h4><h2 id="totalUsers" style="font-size:28px; color:#5b7fff;">0</h2></div>
-                <div class="card"><h4>Total Balance</h4><h2 id="totalBalance" style="font-size:28px; color:#fb923c;">৳ 0.00</h2></div>
-                <div class="card"><h4>Pending Withdrawals</h4><h2 id="pendingWith" style="font-size:28px; color:#f59e0b;">0</h2></div>
-                <div class="card"><h4>Total Earned</h4><h2 id="totalEarned" style="font-size:28px; color:#10b981;">৳ 0.00</h2></div>
+    
+    <!-- RECEIPT MODAL -->
+    <div class="modal-overlay" id="receipt-overlay">
+        <div class="modal" style="max-width: 400px;">
+            <div id="receipt-content" style="text-align: center;">
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 48px;">✅</span>
+                    <h2 style="margin: 10px 0 0 0; color: #900C3F;">Order Confirmed!</h2>
+                </div>
+                
+                <div style="background: #f8f8f8; border-radius: 12px; padding: 16px; margin-bottom: 16px; text-align: left;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                        <span>Order ID:</span>
+                        <span id="receipt-order-id" style="font-weight: 600;"></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                        <span>Date & Time:</span>
+                        <span id="receipt-datetime" style="font-weight: 600;"></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                        <span>Payment:</span>
+                        <span id="receipt-payment" style="font-weight: 600;"></span>
+                    </div>
+                    <div style="border-top: 1px solid #ddd; padding-top: 8px; margin-top: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                            <span>Subtotal:</span>
+                            <span id="receipt-subtotal"></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; color: #900C3F;">
+                            <span>Total:</span>
+                            <span id="receipt-total"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="receipt-items" style="margin-bottom: 16px; text-align: left; font-size: 13px; background: #fff5f5; padding: 12px; border-radius: 8px;"></div>
+                
+                <div style="background: rgba(255, 195, 0, 0.1); color: #900C3F; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; font-size: 12px;">
+                    📍 Delivery in 30-45 mins | 🏠 Free Delivery
+                </div>
+                
+                <!-- Watermark -->
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; font-weight: 700; color: rgba(144, 12, 63, 0.05); pointer-events: none; white-space: nowrap;">PAID</div>
             </div>
-        </div>
-
-        <!-- Users -->
-        <div id="users" class="section">
-            <h1 style="margin-bottom:15px;">Users Management</h1>
-            <input type="text" id="userSearch" placeholder="Search users..." onkeyup="filterUsers()" style="margin-bottom:15px;">
-            <div class="table-container">
-                <table id="usersTable">
-                    <thead><tr><th>ID</th><th>Name</th><th>Balance</th><th>Streak</th><th>Actions</th></tr></thead>
-                    <tbody></tbody>
-                </table>
+            
+            <div style="display: flex; gap: 10px; margin-top: 16px;">
+                <button class="btn btn-secondary" onclick="downloadReceipt()" style="flex: 1;">⬇️ Download</button>
+                <button class="btn btn-primary" onclick="shareWhatsApp()" style="flex: 1;">📱 WhatsApp</button>
             </div>
-        </div>
-
-        <!-- Withdrawals -->
-        <div id="withdrawals" class="section">
-            <h1 style="margin-bottom:15px;">Withdrawal Requests</h1>
-            <div class="table-container">
-                <table id="withdrawTable">
-                    <thead><tr><th>User</th><th>Amount</th><th>Method</th><th>Number</th><th>Status</th><th>Action</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Videos -->
-        <div id="videos" class="section">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h1>Video Tasks</h1>
-                <button class="btn btn-primary" onclick="addNewVideo()">+ Add Video</button>
-            </div>
-            <div class="table-container">
-                <table id="videosTable">
-                    <thead><tr><th>Title</th><th>URL</th><th>Actions</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Settings -->
-        <div id="settings" class="section">
-            <h1>Global Settings</h1>
-            <div class="card">
-                <label style="display:block; margin-bottom:8px;">Ad Reward per Watch (৳)</label>
-                <input type="number" id="adReward" value="0.5" step="0.1">
-                <button class="btn btn-primary" style="margin-top:15px;" onclick="saveSettings()">Save Changes</button>
-            </div>
+            <button class="btn" style="background: #e0e0e0; color: #333; margin-top: 10px;" onclick="finishOrder()">Done</button>
         </div>
     </div>
 
     <script>
-        // Firebase Config (same as your app)
-        const firebaseConfig = {
-            apiKey: "AIzaSyBaxt0kpDNSp_023Ny2cNr9cdJ5uQ9Wvn0",
-            projectId: "telegram-adult--content",
-            appId: "1:367156943896:web:12185203366a5067204684"
+        // ==================== STATE MANAGEMENT ====================
+        const state = {
+            productsData: [
+                // BIRYANI
+                {
+                    id: 1,
+                    category: 'Biryani',
+                    name: 'Chicken Biryani Royal',
+                    image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a104?w=400&h=400&fit=crop',
+                    badges: ['premium', 'bestseller'],
+                    variants: [
+                        { name: 'Half', price: 280 },
+                        { name: 'Full', price: 450 }
+                    ]
+                },
+                {
+                    id: 2,
+                    category: 'Biryani',
+                    name: 'Mutton Biryani Supreme',
+                    image: 'https://images.unsplash.com/photo-1585937421612-56834f9fb8e6?w=400&h=400&fit=crop',
+                    badges: ['special'],
+                    variants: [
+                        { name: 'Half', price: 350 },
+                        { name: 'Full', price: 550 }
+                    ]
+                },
+                {
+                    id: 3,
+                    category: 'Biryani',
+                    name: 'Fish Biryani Deluxe',
+                    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop',
+                    badges: ['new'],
+                    variants: [
+                        { name: 'Half', price: 320 },
+                        { name: 'Full', price: 500 }
+                    ]
+                },
+                {
+                    id: 4,
+                    category: 'Biryani',
+                    name: 'Prawn Biryani Luxury',
+                    image: 'https://images.unsplash.com/photo-1519914213119-e5bf8f5b650f?w=400&h=400&fit=crop',
+                    badges: ['bestseller'],
+                    variants: [
+                        { name: 'Half', price: 380 },
+                        { name: 'Full', price: 600 }
+                    ]
+                },
+                // MEZBANI
+                {
+                    id: 5,
+                    category: 'Mezbani',
+                    name: 'Tandoori Chicken',
+                    image: 'https://images.unsplash.com/photo-1599599810694-08df25fa0bff?w=400&h=400&fit=crop',
+                    badges: ['special'],
+                    variants: [
+                        { name: 'Half (3 pcs)', price: 240 },
+                        { name: 'Full (6 pcs)', price: 420 }
+                    ]
+                },
+                {
+                    id: 6,
+                    category: 'Mezbani',
+                    name: 'Kebab Platter',
+                    image: 'https://images.unsplash.com/photo-1603894521222-404886d1d39f?w=400&h=400&fit=crop',
+                    badges: ['premium'],
+                    variants: [
+                        { name: 'Mixed (5pcs)', price: 280 },
+                        { name: 'Special (8pcs)', price: 450 }
+                    ]
+                },
+                // SIDES
+                {
+                    id: 7,
+                    category: 'Sides',
+                    name: 'Raita (Yogurt)',
+                    image: 'https://images.unsplash.com/photo-1488520494662-e989f4ee4053?w=400&h=400&fit=crop',
+                    badges: [],
+                    variants: [
+                        { name: 'Regular', price: 60 },
+                        { name: 'Large', price: 100 }
+                    ]
+                },
+                {
+                    id: 8,
+                    category: 'Sides',
+                    name: 'Salad Fresh Mix',
+                    image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=400&fit=crop',
+                    badges: ['new'],
+                    variants: [
+                        { name: 'Regular', price: 80 },
+                        { name: 'Large', price: 130 }
+                    ]
+                },
+                // DRINKS
+                {
+                    id: 9,
+                    category: 'Drinks',
+                    name: 'Mango Lassi',
+                    image: 'https://images.unsplash.com/photo-1590080876003-cd21b42e4ee3?w=400&h=400&fit=crop',
+                    badges: [],
+                    variants: [
+                        { name: 'Regular', price: 80 },
+                        { name: 'Large', price: 120 }
+                    ]
+                },
+                {
+                    id: 10,
+                    category: 'Drinks',
+                    name: 'Masala Tea',
+                    image: 'https://images.unsplash.com/photo-1597318972857-ae87211d13d4?w=400&h=400&fit=crop',
+                    badges: [],
+                    variants: [
+                        { name: 'Regular', price: 40 },
+                        { name: 'Large', price: 60 }
+                    ]
+                }
+            ],
+            cart: [],
+            allOrders: [],
+            currentPaymentMethod: null,
+            currentCategory: 'Biryani'
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+        // ==================== INITIALIZATION ====================
+        function init() {
+            renderCategories();
+            renderProducts();
+            setupEventListeners();
+        }
 
-        // Replace with your real admin credentials
-        async function adminLogin() {
-            try {
-                await auth.signInWithEmailAndPassword("youradmin@email.com", "yourstrongpassword123");
-                loadDashboard();
-            } catch (e) {
-                alert("Admin login failed. Check credentials.");
+        // ==================== CATEGORY SLIDER ====================
+        function renderCategories() {
+            const categories = ['Biryani', 'Mezbani', 'Sides', 'Drinks'];
+            const slider = document.getElementById('category-slider');
+            slider.innerHTML = '';
+            
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = `category-btn ${cat === state.currentCategory ? 'active' : ''}`;
+                btn.textContent = cat;
+                btn.onclick = () => filterByCategory(cat);
+                slider.appendChild(btn);
+            });
+        }
+
+        function filterByCategory(category) {
+            state.currentCategory = category;
+            renderCategories();
+            renderProducts();
+        }
+
+        // ==================== PRODUCT RENDERING ====================
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            
+            const filtered = state.productsData.filter(p => 
+                p.category === state.currentCategory || 
+                p.name.toLowerCase().includes(document.getElementById('search-input').value.toLowerCase())
+            );
+            
+            filtered.forEach(product => {
+                const card = createProductCard(product);
+                grid.appendChild(card);
+            });
+        }
+
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            
+            // Badge HTML
+            let badgeHTML = '';
+            if (product.badges.includes('premium')) {
+                badgeHTML += '<div class="badge badge-premium">👑 Premium</div>';
             }
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('show');
-        }
-
-        function showSection(sectionId, el) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
-
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            if (el) el.classList.add('active');
-
-            if (sectionId === 'users') loadUsers();
-            if (sectionId === 'withdrawals') loadWithdrawals();
-            if (sectionId === 'videos') loadVideos();
-            if (sectionId === 'dashboard') loadDashboard();
-        }
-
-        async function loadDashboard() {
-            const usersSnap = await db.collection("users").get();
-            let totalBal = 0, totalEar = 0;
-            usersSnap.forEach(doc => {
-                const d = doc.data();
-                totalBal += d.balance || 0;
-                totalEar += d.totalEarned || 0;
-            });
-
-            document.getElementById('totalUsers').textContent = usersSnap.size;
-            document.getElementById('totalBalance').textContent = `৳ ${totalBal.toFixed(2)}`;
-            document.getElementById('totalEarned').textContent = `৳ ${totalEar.toFixed(2)}`;
-
-            const pend = await db.collection("withdrawals").where("status", "==", "Pending").get();
-            document.getElementById('pendingWith').textContent = pend.size;
-        }
-
-        async function loadUsers() {
-            const snap = await db.collection("users").get();
-            const tbody = document.querySelector("#usersTable tbody");
-            tbody.innerHTML = "";
-            snap.forEach(doc => {
-                const u = doc.data();
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="font-size:13px;">${doc.id.slice(0,8)}...</td>
-                    <td>${u.telegramID || 'Guest'}</td>
-                    <td>৳ ${(u.balance || 0).toFixed(2)}</td>
-                    <td>${u.streak || 0}</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm" onclick="editUser('${doc.id}')">Edit</button>
-                    </td>`;
-                tbody.appendChild(row);
-            });
-        }
-
-        window.filterUsers = () => {
-            const term = document.getElementById('userSearch').value.toLowerCase();
-            const rows = document.querySelectorAll("#usersTable tbody tr");
-            rows.forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
-            });
-        };
-
-        window.editUser = async (uid) => {
-            const newBal = prompt("Enter new balance for this user:");
-            if (newBal !== null && !isNaN(newBal)) {
-                await db.collection("users").doc(uid).update({ balance: parseFloat(newBal) });
-                alert("✅ Balance updated successfully!");
-                loadUsers();
+            if (product.badges.includes('bestseller')) {
+                badgeHTML += '<div class="badge badge-bestseller">🔥 Best Seller</div>';
             }
-        };
-
-        async function loadWithdrawals() {
-            const snap = await db.collection("withdrawals").orderBy("time", "desc").get();
-            const tbody = document.querySelector("#withdrawTable tbody");
-            tbody.innerHTML = "";
-            snap.forEach(doc => {
-                const w = doc.data();
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${w.name || 'User'}</td>
-                    <td>৳ ${w.amount}</td>
-                    <td>${w.method}</td>
-                    <td style="font-size:13px;">${w.number}</td>
-                    <td>${w.status}</td>
-                    <td>
-                        ${w.status === "Pending" ? `
-                            <button class="btn btn-success btn-sm" onclick="approveWithdrawal('${doc.id}', \( {w.amount}, ' \){w.userId}')">Approve</button>
-                            <button class="btn btn-danger btn-sm" onclick="rejectWithdrawal('${doc.id}')">Reject</button>
-                        ` : `<span style="color:#10b981;">${w.status}</span>`}
-                    </td>`;
-                tbody.appendChild(row);
-            });
+            if (product.badges.includes('special')) {
+                badgeHTML += '<div class="badge badge-special">⭐ Special</div>';
+            }
+            if (product.badges.includes('new')) {
+                badgeHTML += '<div class="badge badge-new">NEW</div>';
+            }
+            
+            card.innerHTML = `
+                <div class="product-image-container">
+                    <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placeholder.com/300?text=${encodeURIComponent(product.name)}'">
+                    <div class="image-overlay"></div>
+                    ${badgeHTML}
+                </div>
+                <div style="margin-top: 10px;">
+                    <h3 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #333;">${product.name}</h3>
+                    <div class="variant-selector">
+                        <select class="variant-select" data-product-id="${product.id}" onchange="updatePrice(this, ${product.id})">
+                            ${product.variants.map((v, i) => `<option value="${i}">🥄 ${v.name} - ৳${v.price}</option>`).join('')}
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary btn-small" onclick="addToCart(${product.id})" style="margin-top: 8px;">+ Add</button>
+                </div>
+            `;
+            
+            return card;
         }
 
-        window.approveWithdrawal = async (wid, amount, uid) => {
-            if (confirm("Approve this withdrawal?")) {
-                await db.collection("withdrawals").doc(wid).update({ status: "Approved" });
-                await db.collection("users").doc(uid).update({ balance: firebase.firestore.FieldValue.increment(-amount) });
-                alert("✅ Withdrawal Approved!");
-                loadWithdrawals();
-                loadDashboard();
-            }
-        };
-
-        window.rejectWithdrawal = async (wid) => {
-            if (confirm("Reject this request?")) {
-                await db.collection("withdrawals").doc(wid).update({ status: "Rejected" });
-                alert("❌ Withdrawal Rejected");
-                loadWithdrawals();
-            }
-        };
-
-        async function loadVideos() {
-            const snap = await db.collection("videos").get();
-            const tbody = document.querySelector("#videosTable tbody");
-            tbody.innerHTML = "";
-            snap.forEach(doc => {
-                const v = doc.data();
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${v.title}</td>
-                    <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${v.url}</td>
-                    <td><button class="btn btn-danger btn-sm" onclick="deleteVideo('${doc.id}')">Delete</button></td>`;
-                tbody.appendChild(row);
-            });
-        }
-
-        window.addNewVideo = async () => {
-            const title = prompt("Enter Video Title:");
-            const url = prompt("Enter YouTube Embed URL (iframe src):");
-            if (title && url) {
-                await db.collection("videos").add({
-                    title,
-                    url,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        // ==================== CART MANAGEMENT ====================
+        function addToCart(productId) {
+            const product = state.productsData.find(p => p.id === productId);
+            const selector = document.querySelector(`[data-product-id="${productId}"]`);
+            const variantIndex = parseInt(selector.value);
+            const variant = product.variants[variantIndex];
+            
+            const existingItem = state.cart.find(item => 
+                item.id === productId && item.variant.name === variant.name
+            );
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                state.cart.push({
+                    id: productId,
+                    name: product.name,
+                    variant: variant,
+                    quantity: 1,
+                    image: product.image
                 });
-                alert("✅ Video task added!");
-                loadVideos();
             }
-        };
-
-        window.deleteVideo = async (id) => {
-            if (confirm("Delete this video task?")) {
-                await db.collection("videos").doc(id).delete();
-                loadVideos();
-            }
-        };
-
-        function saveSettings() {
-            alert("✅ Settings saved! (You can later save this value to a global Firestore document)");
+            
+            updateCartUI();
+            toggleCart();
         }
 
-        function logout() {
-            if (confirm("Logout from Admin Panel?")) {
-                auth.signOut();
-                location.reload();
+        function updateQuantity(productId, variantName, delta) {
+            const item = state.cart.find(i => i.id === productId && i.variant.name === variantName);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    state.cart = state.cart.filter(i => !(i.id === productId && i.variant.name === variantName));
+                }
+                updateCartUI();
             }
         }
 
-        // Initialize
-        window.onload = () => {
-            adminLogin();   // Change credentials in production
-        };
+        function updateCartUI() {
+            const cartCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').textContent = cartCount;
+            
+            const cartBtn = document.getElementById('cart-btn');
+            if (cartCount > 0) {
+                cartBtn.style.display = 'block';
+            } else {
+                cartBtn.style.display = 'none';
+            }
+            
+            // Render cart items
+            const cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = state.cart.map((item, index) => `
+                <div style="display: flex; gap: 10px; padding: 12px; background: #f8f8f8; border-radius: 8px; margin-bottom: 10px;">
+                    <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 13px;">${item.name}</div>
+                        <div style="font-size: 12px; color: #666; margin: 4px 0;">${item.variant.name} • ৳${item.variant.price}</div>
+                        <div class="quantity-control">
+                            <button class="qty-btn" onclick="updateQuantity(${item.id}, '${item.variant.name}', -1)">−</button>
+                            <span style="min-width: 24px; text-align: center; font-weight: 600;">${item.quantity}</span>
+                            <button class="qty-btn" onclick="updateQuantity(${item.id}, '${item.variant.name}', 1)">+</button>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 700; color: #900C3F;">৳${item.variant.price * item.quantity}</div>
+                        <button onclick="updateQuantity(${item.id}, '${item.variant.name}', -item.quantity)" style="background: none; border: none; color: #999; cursor: pointer; font-size: 12px; margin-top: 4px;">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Update totals
+            const subtotal = state.cart.reduce((sum, item) => sum + (item.variant.price * item.quantity), 0);
+            document.getElementById('subtotal').textContent = `৳${subtotal}`;
+            document.getElementById('grand-total').textContent = `৳${subtotal}`;
+        }
+
+        function toggleCart() {
+            const sheet = document.getElementById('cart-sheet');
+            sheet.classList.toggle('active');
+        }
+
+        function closeCart() {
+            document.getElementById('cart-sheet').classList.remove('active');
+        }
+
+        // ==================== CHECKOUT ====================
+        function proceedCheckout() {
+            if (state.cart.length === 0) {
+                alert('Add items to your cart first!');
+                return;
+            }
+            closeCart();
+            document.getElementById('checkout-modal').classList.add('active');
+        }
+
+        function selectPaymentMethod(method) {
+            state.currentPaymentMethod = method;
+            document.querySelectorAll('input[name="payment"]').forEach(r => r.checked = false);
+            document.getElementById(method + '-radio').checked = true;
+            
+            const detailsDiv = document.getElementById('payment-details');
+            detailsDiv.innerHTML = '';
+            
+            if (method === 'mobile') {
+                detailsDiv.innerHTML = `
+                    <div style="background: #f8f8f8; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="font-weight: 600; margin-bottom: 10px; font-size: 13px;">Send money to:</div>
+                        <div style="background: white; padding: 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 12px; color: #666;">Personal bKash</div>
+                                <div style="font-weight: 600;">01919-123456</div>
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="copyToClipboard('01919123456')" style="padding: 6px 12px;">📋 Copy</button>
+                        </div>
+                        <div style="background: white; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 12px; color: #666;">Merchant bKash</div>
+                                <div style="font-weight: 600;">01917-720557</div>
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="copyToClipboard('01917720557')" style="padding: 6px 12px;">📋 Copy</button>
+                        </div>
+                    </div>
+                    <input type="text" id="transaction-id" placeholder="Enter 10-char Transaction ID" maxlength="10" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 13px; margin-bottom: 16px; text-transform: uppercase;" onkeyup="this.value = this.value.toUpperCase()">
+                `;
+            } else if (method === 'card') {
+                detailsDiv.innerHTML = `
+                    <div style="background: #f8f8f8; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                        <input type="text" placeholder="Card Number" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; font-size: 13px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <input type="text" placeholder="MM/YY" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;">
+                            <input type="text" placeholder="CVV" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;">
+                        </div>
+                        <p style="font-size: 11px; color: #666; margin: 10px 0 0 0;">Secure payment powered by SSLCommerz. Your card details are encrypted.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkout-modal').classList.remove('active');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            alert('Number copied! ✅');
+        }
+
+        function processPayment() {
+            if (!state.currentPaymentMethod) {
+                alert('Please select a payment method');
+                return;
+            }
+            
+            if (state.currentPaymentMethod === 'mobile') {
+                const txId = document.getElementById('transaction-id').value;
+                if (!/^[A-Z0-9]{10}$/.test(txId)) {
+                    alert('Invalid Transaction ID. Must be 10 alphanumeric characters.');
+                    return;
+                }
+            }
+            
+            closeCheckout();
+            
+            // Simulate processing
+            document.getElementById('receipt-overlay').style.opacity = '0.5';
+            document.getElementById('receipt-overlay').classList.add('active');
+            
+            setTimeout(() => {
+                showReceipt();
+            }, 2100);
+        }
+
+        // ==================== RECEIPT ====================
+        function showReceipt() {
+            const orderId = 'OS' + Date.now().toString().slice(-8);
+            const now = new Date();
+            const dateTime = now.toLocaleDateString('en-BD') + ' ' + now.toLocaleTimeString('en-BD', {hour: '2-digit', minute: '2-digit'});
+            const subtotal = state.cart.reduce((sum, item) => sum + (item.variant.price * item.quantity), 0);
+            
+            document.getElementById('receipt-order-id').textContent = orderId;
+            document.getElementById('receipt-datetime').textContent = dateTime;
+            document.getElementById('receipt-payment').textContent = state.currentPaymentMethod === 'cod' ? 'Cash on Delivery' : state.currentPaymentMethod === 'mobile' ? 'Mobile Banking' : 'Card Payment';
+            document.getElementById('receipt-subtotal').textContent = `৳${subtotal}`;
+            document.getElementById('receipt-total').textContent = `৳${subtotal}`;
+            
+            const itemsHTML = state.cart.map(item => `
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>${item.name}</span>
+                        <span>x${item.quantity}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; color: #666; font-size: 12px;">
+                        <span>${item.variant.name} @ ৳${item.variant.price}</span>
+                        <span>৳${item.variant.price * item.quantity}</span>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('receipt-items').innerHTML = itemsHTML;
+            
+            // Store order
+            state.allOrders.push({
+                orderId,
+                dateTime,
+                items: [...state.cart],
+                total: subtotal,
+                paymentMethod: state.currentPaymentMethod
+            });
+            
+            document.getElementById('receipt-overlay').style.opacity = '1';
+        }
+
+        function downloadReceipt() {
+            const element = document.getElementById('receipt-content');
+            html2canvas(element, { scale: 3, backgroundColor: '#fff' }).then(canvas => {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL();
+                link.download = 'receipt_' + Date.now() + '.png';
+                link.click();
+            });
+        }
+
+        function shareWhatsApp() {
+            const orderId = document.getElementById('receipt-order-id').textContent;
+            const itemsList = state.cart.map(i => `${i.name} (${i.variant.name}) x${i.quantity}`).join('%0A');
+            const total = document.getElementById('receipt-total').textContent;
+            
+            const message = `Hello! I just ordered from Osmania Royal Biryani%0A%0AOrder ID: ${orderId}%0A%0AItems:%0A${itemsList}%0A%0ATotal: ${total}%0A%0AThanks!`;
+            const whatsappUrl = `https://wa.me/8801917720557?text=${message}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function finishOrder() {
+            document.getElementById('receipt-overlay').classList.remove('active');
+            state.cart = [];
+            updateCartUI();
+            closeCart();
+            renderProducts();
+            state.currentPaymentMethod = null;
+        }
+
+        // ==================== SEARCH ====================
+        function setupEventListeners() {
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                if (e.target.value.trim()) {
+                    const grid = document.getElementById('product-grid');
+                    grid.innerHTML = '';
+                    
+                    const results = state.productsData.filter(p =>
+                        p.name.toLowerCase().includes(e.target.value.toLowerCase())
+                    );
+                    
+                    results.forEach(p => {
+                        grid.appendChild(createProductCard(p));
+                    });
+                } else {
+                    renderProducts();
+                }
+            });
+        }
+
+        // ==================== ADMIN PANEL ====================
+        document.getElementById('admin-btn').addEventListener('click', () => {
+            const pin = prompt('Enter Admin PIN:');
+            if (pin === '2026') {
+                showAdminPanel();
+            } else if (pin) {
+                alert('Incorrect PIN');
+            }
+        });
+
+        function showAdminPanel() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div style="padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0; font-size: 18px; font-weight: 700;">📊 Admin Dashboard</h2>
+                        <button onclick="location.reload()" style="background: #900C3F; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600;">Back to App</button>
+                    </div>
+                    
+                    <div style="background: #f8f8f8; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                        <div style="font-size: 13px; color: #666; margin-bottom: 4px;">Total Orders</div>
+                        <div style="font-size: 28px; font-weight: 700; color: #900C3F;">${state.allOrders.length}</div>
+                    </div>
+                    
+                    <div style="background: #f8f8f8; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                        <div style="font-size: 13px; color: #666; margin-bottom: 4px;">Total Revenue</div>
+                        <div style="font-size: 28px; font-weight: 700; color: #900C3F;">৳${state.allOrders.reduce((sum, o) => sum + o.total, 0)}</div>
+                    </div>
+                    
+                    <h3 style="margin: 20px 0 12px 0; font-size: 16px; font-weight: 700;">Recent Orders</h3>
+                    ${state.allOrders.length === 0 ? '<p style="color: #999; text-align: center; padding: 20px;">No orders yet</p>' : state.allOrders.map(order => `
+                        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 12px; margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <div style="font-weight: 600; font-size: 13px;">${order.orderId}</div>
+                                <div style="background: #FFC300; color: #900C3F; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">৳${order.total}</div>
+                            </div>
+                            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">${order.dateTime}</div>
+                            <div style="font-size: 12px; background: #f0f0f0; padding: 8px; border-radius: 6px;">
+                                ${order.items.map(i => `${i.name} (${i.variant.name}) x${i.quantity}`).join(' | ')}
+                            </div>
+                            <div style="font-size: 11px; color: #666; margin-top: 8px; text-transform: uppercase;">Payment: ${order.paymentMethod}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function updatePrice(select, productId) {
+            // Just for updating visual feedback on selection
+            select.style.borderColor = '#900C3F';
+        }
+
+        // ==================== START APP ====================
+        init();
     </script>
 </body>
 </html>
