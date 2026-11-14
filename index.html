@@ -312,12 +312,8 @@
     const IMG_URL = "https://image.tmdb.org/t/p/w500";
     const BACKDROP_URL = "https://image.tmdb.org/t/p/w780";
 
-    // Adsterra Direct Link
-    const AD_DIRECT_LINK_1 = "https://www.profitablecpmrate.com/6198791"; 
-    const AD_DIRECT_LINK_2 = "https://www.profitablecpmrate.com/6198791"; 
-
     // =========================================================================
-    // গুগল ড্রাইভ মুভি লিস্ট (এখানে ১২টির বেশি জনপ্রিয় মুভির TMDB ID যুক্ত করা হয়েছে)
+    // গুগল ড্রাইভ মুভি লিস্ট (এখানে মুভির TMDB ID এবং Drive File ID বসাও)
     // =========================================================================
     const GOOGLE_DRIVE_MOVIES = {
       "533535": [
@@ -381,7 +377,6 @@
     const playTrailerBtn = document.getElementById("playTrailerBtn");
 
     let currentMovie = null;
-    let clickStep = 0;
     let countdownInterval = null;
 
     async function loadCustomDriveMovies() {
@@ -440,7 +435,6 @@
 
     function openDetails(movie) {
       currentMovie = movie;
-      clickStep = 0;
 
       const year = movie.release_date ? movie.release_date.split("-")[0] : "N/A";
       const rating = movie.vote_average ? movie.vote_average.toFixed(1) : "N/A";
@@ -456,18 +450,10 @@
       modal.style.display = "flex";
     }
 
+    // সরাসরি ডাউনলোড পেজে রিডাইরেক্ট করবে (কোনো অ্যাড ওপেন হবে না)
     function handleMovieClick() {
       if (!currentMovie) return;
-
-      if (clickStep === 0) {
-        clickStep = 1;
-        window.open(AD_DIRECT_LINK_1, '_blank');
-      } else if (clickStep === 1) {
-        clickStep = 2;
-        window.open(AD_DIRECT_LINK_2, '_blank');
-      } else {
-        openDownloadPage(currentMovie);
-      }
+      openDownloadPage(currentMovie);
     }
 
     function openDownloadPage(movie) {
