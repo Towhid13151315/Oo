@@ -317,7 +317,7 @@
     const AD_DIRECT_LINK_2 = "https://www.profitablecpmrate.com/6198791"; 
 
     // =========================================================================
-    // তোমার GOOGLE DRIVE মুভি লিস্ট (এখানে মুভির TMDB ID এবং Drive File ID বসাও)
+    // গুগল ড্রাইভ মুভি লিস্ট (এখানে ১২টির বেশি জনপ্রিয় মুভির TMDB ID যুক্ত করা হয়েছে)
     // =========================================================================
     const GOOGLE_DRIVE_MOVIES = {
       "533535": [
@@ -328,6 +328,46 @@
       "912649": [
         { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
         { label: "Download 720p (Google Drive)", quality: "900 MB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ],
+      "76600": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 1080p Full HD", quality: "2.1 GB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ],
+      "157336": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 1080p Full HD", quality: "2.4 GB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ],
+      "27205": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 720p (Google Drive)", quality: "1.1 GB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ],
+      "872585": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 1080p Full HD", quality: "2.0 GB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ],
+      "693134": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 720p (Google Drive)", quality: "950 MB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ],
+      "634649": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 1080p Full HD", quality: "1.9 GB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ],
+      "438631": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 720p (Google Drive)", quality: "900 MB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ],
+      "550": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 1080p Full HD", quality: "1.6 GB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ],
+      "680": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 720p (Google Drive)", quality: "1.2 GB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ],
+      "122": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 1080p Full HD", quality: "2.5 GB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
       ]
     };
 
@@ -454,7 +494,6 @@
       container.style.display = "none";
       timerBox.style.display = "block";
 
-      // ১৫ সেকেন্ডের টাইমার শুরু
       clearInterval(countdownInterval);
       let timeLeft = 15;
       timerCount.textContent = timeLeft;
