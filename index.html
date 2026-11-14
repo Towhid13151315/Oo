@@ -1,1101 +1,527 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Osmania Royal Biryani - Premium Food Delivery</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Hind Siliguri Font (Bengali Support) -->
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- html2canvas for Receipt Download -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <style>
-        * {
-            font-family: 'Hind Siliguri', sans-serif;
-        }
-        
-        /* Custom Color Palette */
-        :root {
-            --primary-red: #900C3F;
-            --secondary-gold: #FFC300;
-            --dark-bg: #1a1a1a;
-            --light-bg: #f8f8f8;
-        }
-        
-        /* Premium Animations */
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        @keyframes slideDown {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 195, 0, 0.7); }
-            50% { box-shadow: 0 0 0 10px rgba(255, 195, 0, 0); }
-        }
-        
-        @keyframes zoom-in {
-            from { transform: scale(1); }
-            to { transform: scale(1.05); }
-        }
-        
-        @keyframes badge-rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Glassmorphism Effect */
-        .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        /* Product Image Container */
-        .product-image-container {
-            position: relative;
-            overflow: hidden;
-            border-radius: 12px;
-            aspect-ratio: 1;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
-        }
-        
-        .product-image-container:hover {
-            transform: scale(1.02);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-        }
-        
-        .product-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-        }
-        
-        .product-image-container:hover .product-image {
-            transform: scale(1.08);
-        }
-        
-        /* Premium Badges */
-        .badge {
-            position: absolute;
-            backdrop-filter: blur(8px);
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            z-index: 10;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .badge-premium {
-            top: 12px;
-            left: 12px;
-            background: rgba(144, 12, 63, 0.9);
-            color: #FFC300;
-            padding: 6px 10px;
-            border: 1px solid #FFC300;
-        }
-        
-        .badge-bestseller {
-            top: 12px;
-            right: 12px;
-            background: rgba(255, 195, 0, 0.95);
-            color: #900C3F;
-            padding: 6px 10px;
-            border: 1px solid #900C3F;
-            animation: pulse-glow 2s infinite;
-        }
-        
-        .badge-special {
-            bottom: 12px;
-            left: 12px;
-            background: rgba(255, 255, 255, 0.95);
-            color: #900C3F;
-            padding: 6px 10px;
-            border: 1px solid #900C3F;
-        }
-        
-        .badge-new {
-            top: 12px;
-            right: 12px;
-            background: rgba(220, 38, 38, 0.95);
-            color: white;
-            padding: 6px 10px;
-            animation: bounce 0.6s ease-in-out infinite;
-        }
-        
-        /* Image Gradient Overlay */
-        .image-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(144, 12, 63, 0) 0%, rgba(144, 12, 63, 0.1) 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .product-image-container:hover .image-overlay {
-            opacity: 1;
-        }
-        
-        /* Bottom Sheet Cart */
-        .bottom-sheet {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: 24px 24px 0 0;
-            max-width: 480px;
-            left: 50%;
-            transform: translateX(-50%);
-            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
-            z-index: 40;
-            animation: slideUp 0.4s ease;
-            display: none;
-        }
-        
-        .bottom-sheet.active {
-            display: block;
-        }
-        
-        /* Mobile Container */
-        .mobile-container {
-            max-width: 480px;
-            margin: 0 auto;
-            background: white;
-            min-height: 100vh;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #900C3F 0%, #6b0a2f 100%);
-            color: white;
-            padding: 20px;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: 0 4px 20px rgba(144, 12, 63, 0.2);
-        }
-        
-        /* Search Bar */
-        .search-bar {
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid #FFC300;
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-size: 14px;
-            color: #333;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-        
-        .search-bar:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(255, 195, 0, 0.2);
-            border-color: #900C3F;
-        }
-        
-        /* Category Slider */
-        .category-slider {
-            display: flex;
-            gap: 10px;
-            padding: 16px 20px;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .category-btn {
-            padding: 10px 20px;
-            border-radius: 24px;
-            border: 2px solid #900C3F;
-            background: white;
-            color: #900C3F;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-        
-        .category-btn.active {
-            background: #900C3F;
-            color: white;
-            box-shadow: 0 4px 12px rgba(144, 12, 63, 0.3);
-        }
-        
-        /* Product Grid */
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            padding: 20px;
-        }
-        
-        .product-card {
-            background: white;
-            border-radius: 16px;
-            padding: 12px;
-            border: 1px solid #f0f0f0;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .product-card:hover {
-            border-color: #FFC300;
-            box-shadow: 0 8px 24px rgba(255, 195, 0, 0.15);
-        }
-        
-        /* Variant Selector */
-        .variant-selector {
-            background: #f8f8f8;
-            border-radius: 8px;
-            padding: 8px;
-            margin: 10px 0;
-        }
-        
-        .variant-select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 13px;
-            background: white;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .variant-select:focus {
-            outline: none;
-            border-color: #900C3F;
-            box-shadow: 0 0 0 2px rgba(144, 12, 63, 0.1);
-        }
-        
-        /* Modal Overlay */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .modal-overlay.active {
-            display: flex;
-        }
-        
-        .modal {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            max-width: 420px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.4s ease;
-        }
-        
-        /* Buttons */
-        .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
-            border: none;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .btn-primary {
-            background: #900C3F;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #6b0a2f;
-            box-shadow: 0 4px 12px rgba(144, 12, 63, 0.3);
-        }
-        
-        .btn-secondary {
-            background: #FFC300;
-            color: #900C3F;
-        }
-        
-        .btn-secondary:hover {
-            background: #FFB300;
-            box-shadow: 0 4px 12px rgba(255, 195, 0, 0.3);
-        }
-        
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 12px;
-            width: auto;
-        }
-        
-        /* Quantity Controls */
-        .quantity-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #f0f0f0;
-            border-radius: 8px;
-            padding: 4px;
-            width: fit-content;
-        }
-        
-        .qty-btn {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #900C3F;
-            transition: all 0.2s ease;
-        }
-        
-        .qty-btn:hover {
-            background: #900C3F;
-            color: white;
-        }
-        
-        /* Badge Animation */
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #900C3F;
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6b0a2f;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CINEBOX - Watch & Download Movies</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #080a10; color: #fff; font-family: Arial, sans-serif; }
+
+    .navbar {
+      height: 70px; padding: 0 7%; display: flex; align-items: center;
+      justify-content: space-between; background: #0c0e16; position: sticky;
+      top: 0; z-index: 10; border-bottom: 1px solid #1a1d2b;
+    }
+    .logo { font-size: 25px; font-weight: 900; color: white; text-decoration: none; }
+    .logo span { color: #a855f7; }
+    .search-btn {
+      background: #202331; color: white; border: none; padding: 10px 16px;
+      border-radius: 8px; font-size: 20px; cursor: pointer;
+    }
+
+    .hero {
+      min-height: 360px; display: flex; align-items: center; padding: 45px 8%;
+      background: linear-gradient(90deg, #080a10 15%, #080a10dd 55%, transparent),
+                  linear-gradient(0deg, #080a10, transparent 70%),
+                  url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600");
+      background-size: cover; background-position: center;
+    }
+    .hero-content { max-width: 520px; }
+    .tag { color: #c084fc; letter-spacing: 3px; font-size: 12px; font-weight: bold; }
+    .hero h1 { font-size: clamp(34px, 7vw, 60px); line-height: 1.05; margin: 16px 0; }
+    .hero p { color: #bbb; line-height: 1.7; margin-bottom: 22px; }
+
+    .watch-btn {
+      display: inline-block; background: #9333ea; color: white; padding: 14px 22px;
+      border-radius: 8px; text-decoration: none; font-weight: bold; border: none;
+      cursor: pointer; font-size: 15px; text-align: center; width: 100%;
+      transition: 0.2s;
+    }
+    .watch-btn:hover { background: #7e22ce; }
+
+    .movies-section { padding: 35px 7%; }
+    .section-heading { margin-bottom: 20px; }
+    .section-heading h2 { font-size: 25px; margin-bottom: 6px; }
+    .section-heading span { color: #888; font-size: 13px; }
+
+    #searchInput {
+      width: 100%; padding: 15px; border-radius: 9px; border: 1px solid #292d3b;
+      background: #131621; color: white; outline: none; margin-bottom: 20px; font-size: 15px;
+    }
+
+    /* Ad Container Styling */
+    .ad-banner-box {
+      width: 100%; min-height: 70px; background: #11141f;
+      border: 1px dashed #33384d; border-radius: 10px; margin: 18px 0;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; overflow: hidden; padding: 8px; text-align: center;
+    }
+    .ad-label {
+      font-size: 10px; color: #666; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 4px;
+    }
+
+    .categories { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; }
+    .categories button {
+      padding: 9px 18px; border: 1px solid #292d3b; background: #131621;
+      color: #aaa; border-radius: 20px; white-space: nowrap; cursor: pointer;
+    }
+    .categories button.active { background: #9333ea; color: white; border-color: #9333ea; }
+
+    .movie-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .movie-card { cursor: pointer; min-width: 0; position: relative; }
+    .poster {
+      aspect-ratio: 2 / 3; border-radius: 12px; background: #151824;
+      overflow: hidden; transition: 0.3s; border: 1px solid transparent; position: relative;
+    }
+    .poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .movie-card:hover .poster { transform: translateY(-5px); border-color: #a855f7; }
+    .badge-hd {
+      position: absolute; top: 8px; left: 8px; background: #16a34a;
+      color: white; font-size: 10px; font-weight: bold; padding: 3px 7px; border-radius: 4px;
+    }
+    .movie-card h3 {
+      margin-top: 10px; font-size: 15px; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .movie-card p { color: #888; margin-top: 5px; font-size: 12px; }
+
+    /* Modal */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(8, 10, 16, 0.95); z-index: 100; justify-content: center;
+      align-items: center; padding: 15px; overflow-y: auto;
+    }
+    .modal-content {
+      background: #121520; width: 100%; max-width: 720px; border-radius: 14px;
+      overflow: hidden; border: 1px solid #292d3b; position: relative;
+      max-height: 92vh; overflow-y: auto;
+    }
+    .close-btn {
+      position: absolute; top: 15px; right: 15px; background: rgba(0, 0, 0, 0.75);
+      color: white; border: none; width: 36px; height: 36px; border-radius: 50%;
+      font-size: 20px; cursor: pointer; z-index: 10;
+    }
+    .modal-banner { width: 100%; height: 220px; object-fit: cover; }
+    .modal-body { padding: 20px; }
+    .modal-body h2 { font-size: 22px; margin-bottom: 8px; }
+    .modal-meta { color: #c084fc; font-size: 13px; margin-bottom: 12px; font-weight: bold; }
+    .modal-desc { color: #bbb; font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+
+    /* Download Page View */
+    #downloadPage {
+      display: none;
+      padding: 25px 7%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .back-btn {
+      background: #202331; color: #fff; border: 1px solid #33384d;
+      padding: 10px 18px; border-radius: 8px; cursor: pointer;
+      font-size: 14px; margin-bottom: 20px; display: inline-block;
+    }
+    .dl-card {
+      background: #121520; border: 1px solid #292d3b; border-radius: 14px;
+      padding: 20px; text-align: center;
+    }
+    .dl-poster {
+      width: 140px; border-radius: 10px; margin: 0 auto 15px; display: block;
+      border: 2px solid #9333ea;
+    }
+    .dl-links-box {
+      display: flex; flex-direction: column; gap: 12px; margin-top: 20px;
+    }
+    .gdrive-btn {
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(90deg, #16a34a, #15803d); color: white;
+      padding: 15px 20px; border-radius: 10px; text-decoration: none;
+      font-weight: bold; font-size: 15px; border: none; cursor: pointer;
+    }
+    .gdrive-btn:hover { opacity: 0.92; }
+    .gdrive-btn span.quality {
+      background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 6px; font-size: 12px;
+    }
+    .drive-player-box {
+      margin-top: 20px; width: 100%; aspect-ratio: 16 / 9;
+      background: #000; border-radius: 10px; overflow: hidden; display: none;
+    }
+    .drive-player-box iframe { width: 100%; height: 100%; border: none; }
+
+    footer {
+      text-align: center; padding: 30px; background: #0c0e16;
+      color: #888; line-height: 2; margin-top: 30px;
+    }
+    footer h2 { color: #a855f7; }
+
+    @media (max-width: 700px) {
+      .hero { min-height: 300px; padding: 30px 6%; }
+      .movies-section { padding: 25px 5%; }
+      .movie-grid { grid-template-columns: repeat(2, 1fr); gap: 16px 12px; }
+      .modal-banner { height: 170px; }
+    }
+  </style>
 </head>
-<body style="margin: 0; padding: 0; background: #f0f0f0;">
-    <div class="mobile-container">
-        <!-- HEADER -->
-        <div class="header">
-            <div class="flex justify-between items-center mb-4">
-                <div class="flex items-center gap-2">
-                    <span style="font-size: 28px;">🥘</span>
-                    <div>
-                        <h1 style="margin: 0; font-size: 20px; font-weight: 700;">Osmania Royal</h1>
-                        <p style="margin: 0; font-size: 12px; opacity: 0.9;">Chattogram's Finest</p>
-                    </div>
-                </div>
-                <button id="admin-btn" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 600;">ADMIN</button>
-            </div>
-            <input type="text" id="search-input" class="search-bar" placeholder="🔍 Search biryani...">
-        </div>
-        
-        <!-- CATEGORY SLIDER -->
-        <div class="category-slider" id="category-slider"></div>
-        
-        <!-- MAIN CONTENT -->
-        <div id="main-content" style="padding-bottom: 100px;">
-            <div class="product-grid" id="product-grid"></div>
-        </div>
-        
-        <!-- FLOATING CART BUTTON -->
-        <div id="cart-btn" style="position: fixed; bottom: 30px; right: 20px; max-width: 480px; right: calc((100vw - 480px) / 2 + 20px); background: #900C3F; color: white; padding: 14px 20px; border-radius: 50px; border: none; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 8px 24px rgba(144, 12, 63, 0.4); z-index: 30; display: none; animation: slideUp 0.4s ease;" onclick="toggleCart()">
-            <span id="cart-count">0</span> 🛒 View Cart
-        </div>
-        
-        <!-- BOTTOM SHEET CART -->
-        <div class="bottom-sheet" id="cart-sheet" style="height: auto; max-height: 70vh; overflow-y: auto;">
-            <div style="padding: 20px; border-bottom: 1px solid #e0e0e0;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2 style="margin: 0; font-size: 18px; font-weight: 700;">Your Cart</h2>
-                    <button onclick="closeCart()" style="background: #f0f0f0; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">✕</button>
-                </div>
-            </div>
-            
-            <div id="cart-items" style="padding: 16px;"></div>
-            
-            <div style="padding: 16px; border-top: 2px solid #e0e0e0;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-                    <span>Subtotal:</span>
-                    <span id="subtotal">৳0</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 16px; font-weight: 700;">
-                    <span>Grand Total:</span>
-                    <span id="grand-total" style="color: #900C3F; font-size: 18px;">৳0</span>
-                </div>
-                <button class="btn btn-primary" onclick="proceedCheckout()">Proceed to Checkout 💳</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- CHECKOUT MODAL -->
-    <div class="modal-overlay" id="checkout-modal">
-        <div class="modal">
-            <h2 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 700; text-align: center;">Choose Payment Method</h2>
-            
-            <!-- COD -->
-            <div style="background: #f8f8f8; border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="selectPaymentMethod('cod')">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <input type="radio" name="payment" id="cod-radio" value="cod">
-                    <label for="cod-radio" style="flex: 1; cursor: pointer; margin: 0;">
-                        <div style="font-weight: 600; margin-bottom: 4px;">💵 Cash on Delivery</div>
-                        <div style="font-size: 12px; color: #666;">Pay when your order arrives</div>
-                    </label>
-                </div>
-            </div>
-            
-            <!-- bKash/Nagad -->
-            <div style="background: #f8f8f8; border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="selectPaymentMethod('mobile')">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <input type="radio" name="payment" id="mobile-radio" value="mobile">
-                    <label for="mobile-radio" style="flex: 1; cursor: pointer; margin: 0;">
-                        <div style="font-weight: 600; margin-bottom: 4px;">📱 Mobile Banking (bKash/Nagad)</div>
-                        <div style="font-size: 12px; color: #666;">Quick & Secure Payment</div>
-                    </label>
-                </div>
-            </div>
-            
-            <!-- Card Payment -->
-            <div style="background: #f8f8f8; border-radius: 12px; padding: 16px; margin-bottom: 20px; cursor: pointer; transition: all 0.3s ease;" onclick="selectPaymentMethod('card')">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <input type="radio" name="payment" id="card-radio" value="card">
-                    <label for="card-radio" style="flex: 1; cursor: pointer; margin: 0;">
-                        <div style="font-weight: 600; margin-bottom: 4px;">💳 Card Payment</div>
-                        <div style="font-size: 12px; color: #666;">Visa, Mastercard, etc.</div>
-                    </label>
-                </div>
-            </div>
-            
-            <!-- Payment Details Form (Dynamic) -->
-            <div id="payment-details"></div>
-            
-            <button class="btn btn-primary" onclick="processPayment()">Confirm Payment 💰</button>
-            <button class="btn" style="background: #e0e0e0; color: #333; margin-top: 10px;" onclick="closeCheckout()">Cancel</button>
-        </div>
-    </div>
-    
-    <!-- RECEIPT MODAL -->
-    <div class="modal-overlay" id="receipt-overlay">
-        <div class="modal" style="max-width: 400px;">
-            <div id="receipt-content" style="text-align: center;">
-                <div style="margin-bottom: 20px;">
-                    <span style="font-size: 48px;">✅</span>
-                    <h2 style="margin: 10px 0 0 0; color: #900C3F;">Order Confirmed!</h2>
-                </div>
-                
-                <div style="background: #f8f8f8; border-radius: 12px; padding: 16px; margin-bottom: 16px; text-align: left;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                        <span>Order ID:</span>
-                        <span id="receipt-order-id" style="font-weight: 600;"></span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                        <span>Date & Time:</span>
-                        <span id="receipt-datetime" style="font-weight: 600;"></span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                        <span>Payment:</span>
-                        <span id="receipt-payment" style="font-weight: 600;"></span>
-                    </div>
-                    <div style="border-top: 1px solid #ddd; padding-top: 8px; margin-top: 8px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                            <span>Subtotal:</span>
-                            <span id="receipt-subtotal"></span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; color: #900C3F;">
-                            <span>Total:</span>
-                            <span id="receipt-total"></span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="receipt-items" style="margin-bottom: 16px; text-align: left; font-size: 13px; background: #fff5f5; padding: 12px; border-radius: 8px;"></div>
-                
-                <div style="background: rgba(255, 195, 0, 0.1); color: #900C3F; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; font-size: 12px;">
-                    📍 Delivery in 30-45 mins | 🏠 Free Delivery
-                </div>
-                
-                <!-- Watermark -->
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; font-weight: 700; color: rgba(144, 12, 63, 0.05); pointer-events: none; white-space: nowrap;">PAID</div>
-            </div>
-            
-            <div style="display: flex; gap: 10px; margin-top: 16px;">
-                <button class="btn btn-secondary" onclick="downloadReceipt()" style="flex: 1;">⬇️ Download</button>
-                <button class="btn btn-primary" onclick="shareWhatsApp()" style="flex: 1;">📱 WhatsApp</button>
-            </div>
-            <button class="btn" style="background: #e0e0e0; color: #333; margin-top: 10px;" onclick="finishOrder()">Done</button>
-        </div>
+<body>
+
+  <header class="navbar">
+    <a class="logo" href="#" onclick="showHomePage()">CINE<span>BOX</span></a>
+    <button class="search-btn" onclick="focusSearch()">⌕</button>
+  </header>
+
+  <!-- হোম পেজ (Main Home View) -->
+  <main id="homePage">
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <span class="tag">DIRECT GOOGLE DRIVE STREAM & DOWNLOAD</span>
+        <h1>Unlimited<br>Movies.</h1>
+        <p>Watch online or download high-speed Google Drive links instantly.</p>
+        <a href="#movies" class="watch-btn" style="display:inline-block; width:auto;">Explore Movies →</a>
+      </div>
+    </section>
+
+    <section class="movies-section" id="movies">
+      <div class="section-heading">
+        <h2 id="sectionTitle">Trending Movies</h2>
+        <span>Tap any movie to Watch or Download</span>
+      </div>
+
+      <input type="search" id="searchInput" placeholder="Search any movie...">
+
+      <!-- ১. হোম পেজ টপ ব্যানার অ্যাড -->
+      <div class="ad-banner-box">
+        <span class="ad-label">Advertisement</span>
+        <script data-cfasync="false" src="https://aarems.org/1/aaf28769d454716d823e6ff5823389ca"></script>
+      </div>
+
+      <div class="categories" id="categories">
+        <button class="active" data-genre="custom">Available G-Drive</button>
+        <button data-genre="">Trending</button>
+        <button data-genre="28">Action</button>
+        <button data-genre="878">Sci-Fi</button>
+        <button data-genre="18">Drama</button>
+        <button data-genre="35">Comedy</button>
+      </div>
+
+      <div class="movie-grid" id="movieGrid"></div>
+
+      <!-- ২. হোম পেজ মিডল ব্যানার অ্যাড -->
+      <div class="ad-banner-box" style="margin-top: 35px;">
+        <span class="ad-label">Advertisement</span>
+        <script async="async" data-cfasync="false" src="https://bancadeltempoidea.org/21/22b8209b432c0c7c295b13d5515fd85f"></script>
+        <div id="container-22b8209b432c0c7c295b13d5515fd85f"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ডাউনলোড ও ওয়াচ পেজ (Dedicated Download Page) -->
+  <section id="downloadPage">
+    <button class="back-btn" onclick="showHomePage()">← Back to Movies</button>
+
+    <!-- ডাউনলোড পেজ টপ ব্যানার অ্যাড -->
+    <div class="ad-banner-box">
+      <span class="ad-label">Advertisement</span>
+      <script data-cfasync="false" src="https://bancadeltempoidea.org/14/7afb72719d852e8d8c62c30347049cbc"></script>
     </div>
 
-    <script>
-        // ==================== STATE MANAGEMENT ====================
-        const state = {
-            productsData: [
-                // BIRYANI
-                {
-                    id: 1,
-                    category: 'Biryani',
-                    name: 'Chicken Biryani Royal',
-                    image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a104?w=400&h=400&fit=crop',
-                    badges: ['premium', 'bestseller'],
-                    variants: [
-                        { name: 'Half', price: 280 },
-                        { name: 'Full', price: 450 }
-                    ]
-                },
-                {
-                    id: 2,
-                    category: 'Biryani',
-                    name: 'Mutton Biryani Supreme',
-                    image: 'https://images.unsplash.com/photo-1585937421612-56834f9fb8e6?w=400&h=400&fit=crop',
-                    badges: ['special'],
-                    variants: [
-                        { name: 'Half', price: 350 },
-                        { name: 'Full', price: 550 }
-                    ]
-                },
-                {
-                    id: 3,
-                    category: 'Biryani',
-                    name: 'Fish Biryani Deluxe',
-                    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop',
-                    badges: ['new'],
-                    variants: [
-                        { name: 'Half', price: 320 },
-                        { name: 'Full', price: 500 }
-                    ]
-                },
-                {
-                    id: 4,
-                    category: 'Biryani',
-                    name: 'Prawn Biryani Luxury',
-                    image: 'https://images.unsplash.com/photo-1519914213119-e5bf8f5b650f?w=400&h=400&fit=crop',
-                    badges: ['bestseller'],
-                    variants: [
-                        { name: 'Half', price: 380 },
-                        { name: 'Full', price: 600 }
-                    ]
-                },
-                // MEZBANI
-                {
-                    id: 5,
-                    category: 'Mezbani',
-                    name: 'Tandoori Chicken',
-                    image: 'https://images.unsplash.com/photo-1599599810694-08df25fa0bff?w=400&h=400&fit=crop',
-                    badges: ['special'],
-                    variants: [
-                        { name: 'Half (3 pcs)', price: 240 },
-                        { name: 'Full (6 pcs)', price: 420 }
-                    ]
-                },
-                {
-                    id: 6,
-                    category: 'Mezbani',
-                    name: 'Kebab Platter',
-                    image: 'https://images.unsplash.com/photo-1603894521222-404886d1d39f?w=400&h=400&fit=crop',
-                    badges: ['premium'],
-                    variants: [
-                        { name: 'Mixed (5pcs)', price: 280 },
-                        { name: 'Special (8pcs)', price: 450 }
-                    ]
-                },
-                // SIDES
-                {
-                    id: 7,
-                    category: 'Sides',
-                    name: 'Raita (Yogurt)',
-                    image: 'https://images.unsplash.com/photo-1488520494662-e989f4ee4053?w=400&h=400&fit=crop',
-                    badges: [],
-                    variants: [
-                        { name: 'Regular', price: 60 },
-                        { name: 'Large', price: 100 }
-                    ]
-                },
-                {
-                    id: 8,
-                    category: 'Sides',
-                    name: 'Salad Fresh Mix',
-                    image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=400&fit=crop',
-                    badges: ['new'],
-                    variants: [
-                        { name: 'Regular', price: 80 },
-                        { name: 'Large', price: 130 }
-                    ]
-                },
-                // DRINKS
-                {
-                    id: 9,
-                    category: 'Drinks',
-                    name: 'Mango Lassi',
-                    image: 'https://images.unsplash.com/photo-1590080876003-cd21b42e4ee3?w=400&h=400&fit=crop',
-                    badges: [],
-                    variants: [
-                        { name: 'Regular', price: 80 },
-                        { name: 'Large', price: 120 }
-                    ]
-                },
-                {
-                    id: 10,
-                    category: 'Drinks',
-                    name: 'Masala Tea',
-                    image: 'https://images.unsplash.com/photo-1597318972857-ae87211d13d4?w=400&h=400&fit=crop',
-                    badges: [],
-                    variants: [
-                        { name: 'Regular', price: 40 },
-                        { name: 'Large', price: 60 }
-                    ]
-                }
-            ],
-            cart: [],
-            allOrders: [],
-            currentPaymentMethod: null,
-            currentCategory: 'Biryani'
+    <div class="dl-card">
+      <img id="dlPoster" class="dl-poster" src="" alt="Poster">
+      <h2 id="dlTitle" style="font-size: 24px; margin-bottom: 6px;">Movie Name</h2>
+      <p id="dlMeta" style="color: #c084fc; font-size: 13px; margin-bottom: 15px;">2026 • Full HD</p>
+      <p style="color: #aaa; font-size: 13px; line-height: 1.5;">নিচের বাটন থেকে সরাসরি অনলাইনে দেখতে পারো অথবা Google Drive থেকে হাই-স্পিডে ডাউনলোড করে নিতে পারো।</p>
+
+      <!-- ইনলাইন গুগল ড্রাইভ প্লেয়ার -->
+      <div class="drive-player-box" id="drivePlayerBox">
+        <iframe id="driveIframe" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      </div>
+
+      <!-- গুগল ড্রাইভ লিংক বাটনগুলো এখানে অটোমেটিক লোড হবে -->
+      <div class="dl-links-box" id="dlLinksContainer"></div>
+    </div>
+
+    <!-- ডাউনলোড পেজ বটম ব্যানার অ্যাড -->
+    <div class="ad-banner-box" style="margin-top: 25px;">
+      <span class="ad-label">Sponsored</span>
+      <script>
+        atOptions = {
+          'key' : 'fba6266e1bb2c17c74a98d9beecc4488',
+          'format' : 'iframe',
+          'height' : 300,
+          'width' : 160,
+          'params' : {}
         };
+      </script>
+      <script src="https://bancadeltempoidea.org/22/fba6266e1bb2c17c74a98d9beecc4488"></script>
+    </div>
+  </section>
 
-        // ==================== INITIALIZATION ====================
-        function init() {
-            renderCategories();
-            renderProducts();
-            setupEventListeners();
-        }
+  <!-- Movie Details Modal -->
+  <div class="modal" id="movieModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">×</button>
+      <img id="modalBanner" class="modal-banner" src="" alt="Banner">
+      <div class="modal-body">
+        <h2 id="modalTitle">Movie Title</h2>
+        <div class="modal-meta" id="modalMeta">2026 • ★ 8.5</div>
+        <p class="modal-desc" id="modalDesc">Loading details...</p>
+        <button class="watch-btn" id="playTrailerBtn" onclick="handleMovieClick()">▶ Watch / Download Movie</button>
 
-        // ==================== CATEGORY SLIDER ====================
-        function renderCategories() {
-            const categories = ['Biryani', 'Mezbani', 'Sides', 'Drinks'];
-            const slider = document.getElementById('category-slider');
-            slider.innerHTML = '';
-            
-            categories.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = `category-btn ${cat === state.currentCategory ? 'active' : ''}`;
-                btn.textContent = cat;
-                btn.onclick = () => filterByCategory(cat);
-                slider.appendChild(btn);
-            });
-        }
+        <!-- পপআপ ব্যানার অ্যাড -->
+        <div class="ad-banner-box" style="margin-top: 18px; margin-bottom: 0;">
+          <span class="ad-label">Sponsored</span>
+          <script>
+            atOptions = {
+              'key' : '1196b1f23a8f7693bc6a46b11e956d29',
+              'format' : 'iframe',
+              'height' : 250,
+              'width' : 300,
+              'params' : {}
+            };
+          </script>
+          <script src="https://bancadeltempoidea.org/22/1196b1f23a8f7693bc6a46b11e956d29"></script>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        function filterByCategory(category) {
-            state.currentCategory = category;
-            renderCategories();
-            renderProducts();
-        }
+  <footer>
+    <h2>CINEBOX</h2>
+    <p>High-Speed Google Drive Movie Portal</p>
+    <p>© 2026 CINEBOX. All rights reserved.</p>
+  </footer>
 
-        // ==================== PRODUCT RENDERING ====================
-        function renderProducts() {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
-            
-            const filtered = state.productsData.filter(p => 
-                p.category === state.currentCategory || 
-                p.name.toLowerCase().includes(document.getElementById('search-input').value.toLowerCase())
-            );
-            
-            filtered.forEach(product => {
-                const card = createProductCard(product);
-                grid.appendChild(card);
-            });
-        }
+  <script>
+    const API_KEY = "fad86037066e7c1fc5a2016ad3f746c8";
+    const BASE_URL = "https://api.themoviedb.org/3";
+    const IMG_URL = "https://image.tmdb.org/t/p/w500";
+    const BACKDROP_URL = "https://image.tmdb.org/t/p/w780";
 
-        function createProductCard(product) {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            
-            // Badge HTML
-            let badgeHTML = '';
-            if (product.badges.includes('premium')) {
-                badgeHTML += '<div class="badge badge-premium">👑 Premium</div>';
-            }
-            if (product.badges.includes('bestseller')) {
-                badgeHTML += '<div class="badge badge-bestseller">🔥 Best Seller</div>';
-            }
-            if (product.badges.includes('special')) {
-                badgeHTML += '<div class="badge badge-special">⭐ Special</div>';
-            }
-            if (product.badges.includes('new')) {
-                badgeHTML += '<div class="badge badge-new">NEW</div>';
-            }
-            
-            card.innerHTML = `
-                <div class="product-image-container">
-                    <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placeholder.com/300?text=${encodeURIComponent(product.name)}'">
-                    <div class="image-overlay"></div>
-                    ${badgeHTML}
-                </div>
-                <div style="margin-top: 10px;">
-                    <h3 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #333;">${product.name}</h3>
-                    <div class="variant-selector">
-                        <select class="variant-select" data-product-id="${product.id}" onchange="updatePrice(this, ${product.id})">
-                            ${product.variants.map((v, i) => `<option value="${i}">🥄 ${v.name} - ৳${v.price}</option>`).join('')}
-                        </select>
-                    </div>
-                    <button class="btn btn-secondary btn-small" onclick="addToCart(${product.id})" style="margin-top: 8px;">+ Add</button>
-                </div>
-            `;
-            
-            return card;
-        }
+    // তোমার Adsterra Smartlink (Direct Link)
+    const AD_DIRECT_LINK_1 = "https://www.profitablecpmrate.com/6198791"; 
+    const AD_DIRECT_LINK_2 = "https://www.profitablecpmrate.com/6198791"; 
 
-        // ==================== CART MANAGEMENT ====================
-        function addToCart(productId) {
-            const product = state.productsData.find(p => p.id === productId);
-            const selector = document.querySelector(`[data-product-id="${productId}"]`);
-            const variantIndex = parseInt(selector.value);
-            const variant = product.variants[variantIndex];
-            
-            const existingItem = state.cart.find(item => 
-                item.id === productId && item.variant.name === variant.name
-            );
-            
-            if (existingItem) {
-                existingItem.quantity++;
-            } else {
-                state.cart.push({
-                    id: productId,
-                    name: product.name,
-                    variant: variant,
-                    quantity: 1,
-                    image: product.image
-                });
-            }
-            
-            updateCartUI();
-            toggleCart();
-        }
+    // =========================================================================
+    // তোমার GOOGLE DRIVE মুভি লিস্ট (এখানে নতুন মুভির TMDB ID ও Drive Link যোগ করবে)
+    // =========================================================================
+    const GOOGLE_DRIVE_MOVIES = {
+      // উদাহরণ ১: Deadpool & Wolverine (TMDB ID: 533535)
+      "533535": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 720p (Google Drive)", quality: "850 MB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" },
+        { label: "Download 1080p Full HD", quality: "1.8 GB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ],
+      // উদাহরণ ২: Venom: The Last Dance (TMDB ID: 912649)
+      "912649": [
+        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
+        { label: "Download 720p (Google Drive)", quality: "900 MB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
+      ]
+    };
 
-        function updateQuantity(productId, variantName, delta) {
-            const item = state.cart.find(i => i.id === productId && i.variant.name === variantName);
-            if (item) {
-                item.quantity += delta;
-                if (item.quantity <= 0) {
-                    state.cart = state.cart.filter(i => !(i.id === productId && i.variant.name === variantName));
-                }
-                updateCartUI();
-            }
-        }
+    const homePage = document.getElementById("homePage");
+    const downloadPage = document.getElementById("downloadPage");
+    const grid = document.getElementById("movieGrid");
+    const searchInput = document.getElementById("searchInput");
+    const sectionTitle = document.getElementById("sectionTitle");
+    const modal = document.getElementById("movieModal");
+    const modalBanner = document.getElementById("modalBanner");
+    const playTrailerBtn = document.getElementById("playTrailerBtn");
 
-        function updateCartUI() {
-            const cartCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-            document.getElementById('cart-count').textContent = cartCount;
-            
-            const cartBtn = document.getElementById('cart-btn');
-            if (cartCount > 0) {
-                cartBtn.style.display = 'block';
-            } else {
-                cartBtn.style.display = 'none';
-            }
-            
-            // Render cart items
-            const cartItems = document.getElementById('cart-items');
-            cartItems.innerHTML = state.cart.map((item, index) => `
-                <div style="display: flex; gap: 10px; padding: 12px; background: #f8f8f8; border-radius: 8px; margin-bottom: 10px;">
-                    <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; font-size: 13px;">${item.name}</div>
-                        <div style="font-size: 12px; color: #666; margin: 4px 0;">${item.variant.name} • ৳${item.variant.price}</div>
-                        <div class="quantity-control">
-                            <button class="qty-btn" onclick="updateQuantity(${item.id}, '${item.variant.name}', -1)">−</button>
-                            <span style="min-width: 24px; text-align: center; font-weight: 600;">${item.quantity}</span>
-                            <button class="qty-btn" onclick="updateQuantity(${item.id}, '${item.variant.name}', 1)">+</button>
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-weight: 700; color: #900C3F;">৳${item.variant.price * item.quantity}</div>
-                        <button onclick="updateQuantity(${item.id}, '${item.variant.name}', -item.quantity)" style="background: none; border: none; color: #999; cursor: pointer; font-size: 12px; margin-top: 4px;">Remove</button>
-                    </div>
-                </div>
-            `).join('');
-            
-            // Update totals
-            const subtotal = state.cart.reduce((sum, item) => sum + (item.variant.price * item.quantity), 0);
-            document.getElementById('subtotal').textContent = `৳${subtotal}`;
-            document.getElementById('grand-total').textContent = `৳${subtotal}`;
-        }
+    let currentMovie = null;
+    let clickStep = 0;
 
-        function toggleCart() {
-            const sheet = document.getElementById('cart-sheet');
-            sheet.classList.toggle('active');
-        }
+    // হোম পেজে প্রথমে তোমার গুগল ড্রাইভে থাকা মুভিগুলো লোড করবে
+    async function loadCustomDriveMovies() {
+      grid.innerHTML = "<p style='color:#888;'>Loading Google Drive Movies...</p>";
+      const ids = Object.keys(GOOGLE_DRIVE_MOVIES);
+      const movies = [];
+      for (const id of ids) {
+        try {
+          const res = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}`);
+          const data = await res.json();
+          if (data && data.id) movies.push(data);
+        } catch (e) {}
+      }
+      displayMovies(movies);
+    }
 
-        function closeCart() {
-            document.getElementById('cart-sheet').classList.remove('active');
-        }
+    async function fetchMovies(url) {
+      grid.innerHTML = "<p style='color:#888;'>Loading movies...</p>";
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        displayMovies(data.results || []);
+      } catch (err) {
+        grid.innerHTML = "<p style='color:#f87171;'>মুভি লোড করতে সমস্যা হয়েছে।</p>";
+      }
+    }
 
-        // ==================== CHECKOUT ====================
-        function proceedCheckout() {
-            if (state.cart.length === 0) {
-                alert('Add items to your cart first!');
-                return;
-            }
-            closeCart();
-            document.getElementById('checkout-modal').classList.add('active');
-        }
+    function displayMovies(movies) {
+      grid.innerHTML = "";
+      if (!movies.length) {
+        grid.innerHTML = "<p style='color:#888;'>কোনো মুভি পাওয়া যায়নি।</p>";
+        return;
+      }
 
-        function selectPaymentMethod(method) {
-            state.currentPaymentMethod = method;
-            document.querySelectorAll('input[name="payment"]').forEach(r => r.checked = false);
-            document.getElementById(method + '-radio').checked = true;
-            
-            const detailsDiv = document.getElementById('payment-details');
-            detailsDiv.innerHTML = '';
-            
-            if (method === 'mobile') {
-                detailsDiv.innerHTML = `
-                    <div style="background: #f8f8f8; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-                        <div style="font-weight: 600; margin-bottom: 10px; font-size: 13px;">Send money to:</div>
-                        <div style="background: white; padding: 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <div style="font-size: 12px; color: #666;">Personal bKash</div>
-                                <div style="font-weight: 600;">01919-123456</div>
-                            </div>
-                            <button class="btn btn-secondary btn-small" onclick="copyToClipboard('01919123456')" style="padding: 6px 12px;">📋 Copy</button>
-                        </div>
-                        <div style="background: white; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <div style="font-size: 12px; color: #666;">Merchant bKash</div>
-                                <div style="font-weight: 600;">01917-720557</div>
-                            </div>
-                            <button class="btn btn-secondary btn-small" onclick="copyToClipboard('01917720557')" style="padding: 6px 12px;">📋 Copy</button>
-                        </div>
-                    </div>
-                    <input type="text" id="transaction-id" placeholder="Enter 10-char Transaction ID" maxlength="10" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 13px; margin-bottom: 16px; text-transform: uppercase;" onkeyup="this.value = this.value.toUpperCase()">
-                `;
-            } else if (method === 'card') {
-                detailsDiv.innerHTML = `
-                    <div style="background: #f8f8f8; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-                        <input type="text" placeholder="Card Number" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; font-size: 13px;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                            <input type="text" placeholder="MM/YY" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;">
-                            <input type="text" placeholder="CVV" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;">
-                        </div>
-                        <p style="font-size: 11px; color: #666; margin: 10px 0 0 0;">Secure payment powered by SSLCommerz. Your card details are encrypted.</p>
-                    </div>
-                `;
-            }
-        }
+      movies.forEach(movie => {
+        if (!movie.poster_path) return;
+        const card = document.createElement("div");
+        card.className = "movie-card";
+        card.onclick = () => openDetails(movie);
 
-        function closeCheckout() {
-            document.getElementById('checkout-modal').classList.remove('active');
-        }
+        const year = movie.release_date ? movie.release_date.split("-")[0] : "N/A";
+        const rating = movie.vote_average ? movie.vote_average.toFixed(1) : "N/A";
+        const hasDrive = GOOGLE_DRIVE_MOVIES[movie.id] ? `<span class="badge-hd">G-DRIVE</span>` : "";
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text);
-            alert('Number copied! ✅');
-        }
+        card.innerHTML = `
+          <div class="poster">
+            ${hasDrive}
+            <img src="${IMG_URL + movie.poster_path}" alt="${movie.title}" loading="lazy">
+          </div>
+          <h3>${movie.title}</h3>
+          <p>${year} • ★ ${rating}</p>
+        `;
+        grid.appendChild(card);
+      });
+    }
 
-        function processPayment() {
-            if (!state.currentPaymentMethod) {
-                alert('Please select a payment method');
-                return;
-            }
-            
-            if (state.currentPaymentMethod === 'mobile') {
-                const txId = document.getElementById('transaction-id').value;
-                if (!/^[A-Z0-9]{10}$/.test(txId)) {
-                    alert('Invalid Transaction ID. Must be 10 alphanumeric characters.');
-                    return;
-                }
-            }
-            
-            closeCheckout();
-            
-            // Simulate processing
-            document.getElementById('receipt-overlay').style.opacity = '0.5';
-            document.getElementById('receipt-overlay').classList.add('active');
-            
-            setTimeout(() => {
-                showReceipt();
-            }, 2100);
-        }
+    function openDetails(movie) {
+      currentMovie = movie;
+      clickStep = 0;
 
-        // ==================== RECEIPT ====================
-        function showReceipt() {
-            const orderId = 'OS' + Date.now().toString().slice(-8);
-            const now = new Date();
-            const dateTime = now.toLocaleDateString('en-BD') + ' ' + now.toLocaleTimeString('en-BD', {hour: '2-digit', minute: '2-digit'});
-            const subtotal = state.cart.reduce((sum, item) => sum + (item.variant.price * item.quantity), 0);
-            
-            document.getElementById('receipt-order-id').textContent = orderId;
-            document.getElementById('receipt-datetime').textContent = dateTime;
-            document.getElementById('receipt-payment').textContent = state.currentPaymentMethod === 'cod' ? 'Cash on Delivery' : state.currentPaymentMethod === 'mobile' ? 'Mobile Banking' : 'Card Payment';
-            document.getElementById('receipt-subtotal').textContent = `৳${subtotal}`;
-            document.getElementById('receipt-total').textContent = `৳${subtotal}`;
-            
-            const itemsHTML = state.cart.map(item => `
-                <div style="margin-bottom: 8px;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>${item.name}</span>
-                        <span>x${item.quantity}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; color: #666; font-size: 12px;">
-                        <span>${item.variant.name} @ ৳${item.variant.price}</span>
-                        <span>৳${item.variant.price * item.quantity}</span>
-                    </div>
-                </div>
-            `).join('');
-            document.getElementById('receipt-items').innerHTML = itemsHTML;
-            
-            // Store order
-            state.allOrders.push({
-                orderId,
-                dateTime,
-                items: [...state.cart],
-                total: subtotal,
-                paymentMethod: state.currentPaymentMethod
-            });
-            
-            document.getElementById('receipt-overlay').style.opacity = '1';
-        }
+      const year = movie.release_date ? movie.release_date.split("-")[0] : "N/A";
+      const rating = movie.vote_average ? movie.vote_average.toFixed(1) : "N/A";
 
-        function downloadReceipt() {
-            const element = document.getElementById('receipt-content');
-            html2canvas(element, { scale: 3, backgroundColor: '#fff' }).then(canvas => {
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL();
-                link.download = 'receipt_' + Date.now() + '.png';
-                link.click();
-            });
-        }
+      document.getElementById("modalTitle").textContent = movie.title;
+      document.getElementById("modalMeta").textContent = `${year} • ★ ${rating} • Lang: ${movie.original_language.toUpperCase()}`;
+      document.getElementById("modalDesc").textContent = movie.overview || "No description available.";
 
-        function shareWhatsApp() {
-            const orderId = document.getElementById('receipt-order-id').textContent;
-            const itemsList = state.cart.map(i => `${i.name} (${i.variant.name}) x${i.quantity}`).join('%0A');
-            const total = document.getElementById('receipt-total').textContent;
-            
-            const message = `Hello! I just ordered from Osmania Royal Biryani%0A%0AOrder ID: ${orderId}%0A%0AItems:%0A${itemsList}%0A%0ATotal: ${total}%0A%0AThanks!`;
-            const whatsappUrl = `https://wa.me/8801917720557?text=${message}`;
-            window.open(whatsappUrl, '_blank');
-        }
+      const bannerPath = movie.backdrop_path || movie.poster_path;
+      modalBanner.src = BACKDROP_URL + bannerPath;
+      playTrailerBtn.textContent = "▶ Watch / Download Movie";
 
-        function finishOrder() {
-            document.getElementById('receipt-overlay').classList.remove('active');
-            state.cart = [];
-            updateCartUI();
-            closeCart();
-            renderProducts();
-            state.currentPaymentMethod = null;
-        }
+      modal.style.display = "flex";
+    }
 
-        // ==================== SEARCH ====================
-        function setupEventListeners() {
-            document.getElementById('search-input').addEventListener('input', (e) => {
-                if (e.target.value.trim()) {
-                    const grid = document.getElementById('product-grid');
-                    grid.innerHTML = '';
-                    
-                    const results = state.productsData.filter(p =>
-                        p.name.toLowerCase().includes(e.target.value.toLowerCase())
-                    );
-                    
-                    results.forEach(p => {
-                        grid.appendChild(createProductCard(p));
-                    });
-                } else {
-                    renderProducts();
-                }
-            });
-        }
+    // ক্লিক করলে প্রথমে ২ বার Adsterra Direct Link ওপেন হবে, তারপর ডাউনলোড পেজে নিয়ে যাবে
+    function handleMovieClick() {
+      if (!currentMovie) return;
 
-        // ==================== ADMIN PANEL ====================
-        document.getElementById('admin-btn').addEventListener('click', () => {
-            const pin = prompt('Enter Admin PIN:');
-            if (pin === '2026') {
-                showAdminPanel();
-            } else if (pin) {
-                alert('Incorrect PIN');
-            }
+      if (clickStep === 0) {
+        clickStep = 1;
+        window.open(AD_DIRECT_LINK_1, '_blank');
+      } else if (clickStep === 1) {
+        clickStep = 2;
+        window.open(AD_DIRECT_LINK_2, '_blank');
+      } else {
+        openDownloadPage(currentMovie);
+      }
+    }
+
+    function openDownloadPage(movie) {
+      closeModal();
+      homePage.style.display = "none";
+      downloadPage.style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      document.getElementById("dlPoster").src = IMG_URL + movie.poster_path;
+      document.getElementById("dlTitle").textContent = movie.title;
+      const year = movie.release_date ? movie.release_date.split("-")[0] : "2026";
+      document.getElementById("dlMeta").textContent = `${year} • Dual Audio / Original • Google Drive Server`;
+
+      const drivePlayerBox = document.getElementById("drivePlayerBox");
+      const driveIframe = document.getElementById("driveIframe");
+      drivePlayerBox.style.display = "none";
+      driveIframe.src = "";
+
+      const container = document.getElementById("dlLinksContainer");
+      container.innerHTML = "";
+
+      const links = GOOGLE_DRIVE_MOVIES[movie.id];
+
+      if (links && links.length > 0) {
+        links.forEach(item => {
+          if (item.isStream && item.driveFileId) {
+            const btn = document.createElement("button");
+            btn.className = "gdrive-btn";
+            btn.style.background = "linear-gradient(90deg, #9333ea, #7e22ce)";
+            btn.innerHTML = `<span>▶ ${item.label}</span> <span class="quality">${item.quality}</span>`;
+            btn.onclick = () => {
+              drivePlayerBox.style.display = "block";
+              driveIframe.src = `https://drive.google.com/file/d/${item.driveFileId}/preview`;
+            };
+            container.appendChild(btn);
+          } else {
+            const a = document.createElement("a");
+            a.className = "gdrive-btn";
+            a.href = item.url;
+            a.target = "_blank";
+            a.innerHTML = `<span>⬇ ${item.label}</span> <span class="quality">${item.quality}</span>`;
+            container.appendChild(a);
+          }
         });
+      } else {
+        // যদি ওই মুভির গুগল ড্রাইভ লিংক এখনো অ্যাড করা না থাকে
+        container.innerHTML = `
+          <div style="padding:15px; background:#1a1e2e; border-radius:8px; color:#facc15; font-size:14px;">
+            এই মুভিটির Google Drive ফাইল এখনো আপলোড করা হচ্ছে। খুব শীঘ্রই লিংক যুক্ত করা হবে!
+          </div>
+        `;
+      }
+    }
 
-        function showAdminPanel() {
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <div style="padding: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h2 style="margin: 0; font-size: 18px; font-weight: 700;">📊 Admin Dashboard</h2>
-                        <button onclick="location.reload()" style="background: #900C3F; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600;">Back to App</button>
-                    </div>
-                    
-                    <div style="background: #f8f8f8; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
-                        <div style="font-size: 13px; color: #666; margin-bottom: 4px;">Total Orders</div>
-                        <div style="font-size: 28px; font-weight: 700; color: #900C3F;">${state.allOrders.length}</div>
-                    </div>
-                    
-                    <div style="background: #f8f8f8; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
-                        <div style="font-size: 13px; color: #666; margin-bottom: 4px;">Total Revenue</div>
-                        <div style="font-size: 28px; font-weight: 700; color: #900C3F;">৳${state.allOrders.reduce((sum, o) => sum + o.total, 0)}</div>
-                    </div>
-                    
-                    <h3 style="margin: 20px 0 12px 0; font-size: 16px; font-weight: 700;">Recent Orders</h3>
-                    ${state.allOrders.length === 0 ? '<p style="color: #999; text-align: center; padding: 20px;">No orders yet</p>' : state.allOrders.map(order => `
-                        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 12px; margin-bottom: 10px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <div style="font-weight: 600; font-size: 13px;">${order.orderId}</div>
-                                <div style="background: #FFC300; color: #900C3F; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">৳${order.total}</div>
-                            </div>
-                            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">${order.dateTime}</div>
-                            <div style="font-size: 12px; background: #f0f0f0; padding: 8px; border-radius: 6px;">
-                                ${order.items.map(i => `${i.name} (${i.variant.name}) x${i.quantity}`).join(' | ')}
-                            </div>
-                            <div style="font-size: 11px; color: #666; margin-top: 8px; text-transform: uppercase;">Payment: ${order.paymentMethod}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
+    function showHomePage() {
+      document.getElementById("driveIframe").src = "";
+      downloadPage.style.display = "none";
+      homePage.style.display = "block";
+    }
+
+    function closeModal() {
+      modal.style.display = "none";
+    }
+
+    let searchTimer;
+    searchInput.addEventListener("input", () => {
+      clearTimeout(searchTimer);
+      const query = searchInput.value.trim();
+      searchTimer = setTimeout(() => {
+        if (query) {
+          sectionTitle.textContent = `Search: "${query}"`;
+          fetchMovies(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+        } else {
+          sectionTitle.textContent = "Available on Google Drive";
+          loadCustomDriveMovies();
         }
+      }, 500);
+    });
 
-        function updatePrice(select, productId) {
-            // Just for updating visual feedback on selection
-            select.style.borderColor = '#900C3F';
+    document.querySelectorAll(".categories button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelector(".categories button.active")?.classList.remove("active");
+        btn.classList.add("active");
+        const genreId = btn.dataset.genre;
+        searchInput.value = "";
+        if (genreId === "custom") {
+          sectionTitle.textContent = "Available on Google Drive";
+          loadCustomDriveMovies();
+        } else if (genreId) {
+          sectionTitle.textContent = `${btn.textContent} Movies`;
+          fetchMovies(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}`);
+        } else {
+          sectionTitle.textContent = "Trending Movies";
+          fetchMovies(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}`);
         }
+      });
+    });
 
-        // ==================== START APP ====================
-        init();
-    </script>
+    function focusSearch() {
+      showHomePage();
+      searchInput.focus();
+      searchInput.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // শুরুতে গুগল ড্রাইভ মুভিগুলো দেখাবে
+    sectionTitle.textContent = "Available on Google Drive";
+    loadCustomDriveMovies();
+  </script>
 </body>
 </html>
