@@ -109,7 +109,7 @@
     .modal-meta { color: #c084fc; font-size: 13px; margin-bottom: 12px; font-weight: bold; }
     .modal-desc { color: #bbb; font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
 
-    /* Download Page View */
+    /* Download Page View & 15s Timer */
     #downloadPage {
       display: none;
       padding: 25px 7%;
@@ -123,14 +123,24 @@
     }
     .dl-card {
       background: #121520; border: 1px solid #292d3b; border-radius: 14px;
-      padding: 20px; text-align: center;
+      padding: 22px; text-align: center;
     }
     .dl-poster {
       width: 140px; border-radius: 10px; margin: 0 auto 15px; display: block;
       border: 2px solid #9333ea;
     }
+    .timer-box {
+      background: #1a1e2e; border: 1px solid #9333ea; border-radius: 12px;
+      padding: 20px; margin: 20px 0;
+    }
+    .timer-circle {
+      width: 64px; height: 64px; border-radius: 50%; background: #9333ea;
+      color: white; font-size: 24px; font-weight: bold; display: flex;
+      align-items: center; justify-content: center; margin: 0 auto 12px;
+      box-shadow: 0 0 15px rgba(147, 51, 234, 0.5);
+    }
     .dl-links-box {
-      display: flex; flex-direction: column; gap: 12px; margin-top: 20px;
+      display: none; flex-direction: column; gap: 12px; margin-top: 20px;
     }
     .gdrive-btn {
       display: flex; align-items: center; justify-content: space-between;
@@ -169,7 +179,7 @@
     <button class="search-btn" onclick="focusSearch()">⌕</button>
   </header>
 
-  <!-- হোম পেজ (Main Home View) -->
+  <!-- হোম পেজ -->
   <main id="homePage">
     <section class="hero" id="home">
       <div class="hero-content">
@@ -182,7 +192,7 @@
 
     <section class="movies-section" id="movies">
       <div class="section-heading">
-        <h2 id="sectionTitle">Trending Movies</h2>
+        <h2 id="sectionTitle">Available on Google Drive</h2>
         <span>Tap any movie to Watch or Download</span>
       </div>
 
@@ -214,7 +224,7 @@
     </section>
   </main>
 
-  <!-- ডাউনলোড ও ওয়াচ পেজ (Dedicated Download Page) -->
+  <!-- ডাউনলোড ও ওয়াচ পেজ (১৫ সেকেন্ডের টাইমারসহ) -->
   <section id="downloadPage">
     <button class="back-btn" onclick="showHomePage()">← Back to Movies</button>
 
@@ -228,14 +238,20 @@
       <img id="dlPoster" class="dl-poster" src="" alt="Poster">
       <h2 id="dlTitle" style="font-size: 24px; margin-bottom: 6px;">Movie Name</h2>
       <p id="dlMeta" style="color: #c084fc; font-size: 13px; margin-bottom: 15px;">2026 • Full HD</p>
-      <p style="color: #aaa; font-size: 13px; line-height: 1.5;">নিচের বাটন থেকে সরাসরি অনলাইনে দেখতে পারো অথবা Google Drive থেকে হাই-স্পিডে ডাউনলোড করে নিতে পারো।</p>
+
+      <!-- ১৫ সেকেন্ডের স্মার্ট কাউন্টডাউন বক্স -->
+      <div class="timer-box" id="timerBox">
+        <div class="timer-circle" id="timerCount">15</div>
+        <p style="font-size: 15px; font-weight: bold; color: #fff; margin-bottom: 5px;">Generating High-Speed Google Drive Link...</p>
+        <p style="font-size: 12px; color: #aaa;">Please wait 15 seconds while we prepare your download server.</p>
+      </div>
 
       <!-- ইনলাইন গুগল ড্রাইভ প্লেয়ার -->
       <div class="drive-player-box" id="drivePlayerBox">
         <iframe id="driveIframe" allow="autoplay; fullscreen" allowfullscreen></iframe>
       </div>
 
-      <!-- গুগল ড্রাইভ লিংক বাটনগুলো এখানে অটোমেটিক লোড হবে -->
+      <!-- টাইমার শেষ হলে এই বাটনগুলো শো করবে -->
       <div class="dl-links-box" id="dlLinksContainer"></div>
     </div>
 
@@ -296,21 +312,19 @@
     const IMG_URL = "https://image.tmdb.org/t/p/w500";
     const BACKDROP_URL = "https://image.tmdb.org/t/p/w780";
 
-    // তোমার Adsterra Smartlink (Direct Link)
+    // Adsterra Direct Link
     const AD_DIRECT_LINK_1 = "https://www.profitablecpmrate.com/6198791"; 
     const AD_DIRECT_LINK_2 = "https://www.profitablecpmrate.com/6198791"; 
 
     // =========================================================================
-    // তোমার GOOGLE DRIVE মুভি লিস্ট (এখানে নতুন মুভির TMDB ID ও Drive Link যোগ করবে)
+    // তোমার GOOGLE DRIVE মুভি লিস্ট (এখানে মুভির TMDB ID এবং Drive File ID বসাও)
     // =========================================================================
     const GOOGLE_DRIVE_MOVIES = {
-      // উদাহরণ ১: Deadpool & Wolverine (TMDB ID: 533535)
       "533535": [
         { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
         { label: "Download 720p (Google Drive)", quality: "850 MB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" },
         { label: "Download 1080p Full HD", quality: "1.8 GB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
       ],
-      // উদাহরণ ২: Venom: The Last Dance (TMDB ID: 912649)
       "912649": [
         { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "YOUR_GOOGLE_DRIVE_FILE_ID_HERE", isStream: true },
         { label: "Download 720p (Google Drive)", quality: "900 MB", url: "https://drive.google.com/file/d/YOUR_GOOGLE_DRIVE_FILE_ID_HERE/view" }
@@ -328,8 +342,8 @@
 
     let currentMovie = null;
     let clickStep = 0;
+    let countdownInterval = null;
 
-    // হোম পেজে প্রথমে তোমার গুগল ড্রাইভে থাকা মুভিগুলো লোড করবে
     async function loadCustomDriveMovies() {
       grid.innerHTML = "<p style='color:#888;'>Loading Google Drive Movies...</p>";
       const ids = Object.keys(GOOGLE_DRIVE_MOVIES);
@@ -402,7 +416,6 @@
       modal.style.display = "flex";
     }
 
-    // ক্লিক করলে প্রথমে ২ বার Adsterra Direct Link ওপেন হবে, তারপর ডাউনলোড পেজে নিয়ে যাবে
     function handleMovieClick() {
       if (!currentMovie) return;
 
@@ -433,8 +446,28 @@
       drivePlayerBox.style.display = "none";
       driveIframe.src = "";
 
+      const timerBox = document.getElementById("timerBox");
+      const timerCount = document.getElementById("timerCount");
       const container = document.getElementById("dlLinksContainer");
+
       container.innerHTML = "";
+      container.style.display = "none";
+      timerBox.style.display = "block";
+
+      // ১৫ সেকেন্ডের টাইমার শুরু
+      clearInterval(countdownInterval);
+      let timeLeft = 15;
+      timerCount.textContent = timeLeft;
+
+      countdownInterval = setInterval(() => {
+        timeLeft--;
+        timerCount.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(countdownInterval);
+          timerBox.style.display = "none";
+          container.style.display = "flex";
+        }
+      }, 1000);
 
       const links = GOOGLE_DRIVE_MOVIES[movie.id];
 
@@ -460,7 +493,6 @@
           }
         });
       } else {
-        // যদি ওই মুভির গুগল ড্রাইভ লিংক এখনো অ্যাড করা না থাকে
         container.innerHTML = `
           <div style="padding:15px; background:#1a1e2e; border-radius:8px; color:#facc15; font-size:14px;">
             এই মুভিটির Google Drive ফাইল এখনো আপলোড করা হচ্ছে। খুব শীঘ্রই লিংক যুক্ত করা হবে!
@@ -470,6 +502,7 @@
     }
 
     function showHomePage() {
+      clearInterval(countdownInterval);
       document.getElementById("driveIframe").src = "";
       downloadPage.style.display = "none";
       homePage.style.display = "block";
@@ -519,7 +552,6 @@
       searchInput.scrollIntoView({ behavior: "smooth" });
     }
 
-    // শুরুতে গুগল ড্রাইভ মুভিগুলো দেখাবে
     sectionTitle.textContent = "Available on Google Drive";
     loadCustomDriveMovies();
   </script>
