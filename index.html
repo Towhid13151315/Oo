@@ -80,7 +80,6 @@
     }
     .movie-card p { color: #888; margin-top: 3px; font-size: 11px; }
 
-    /* Modal */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(8, 10, 16, 0.95); z-index: 1000; justify-content: center;
@@ -102,7 +101,6 @@
     .modal-meta { color: #c084fc; font-size: 12px; margin-bottom: 10px; font-weight: bold; }
     .modal-desc { color: #bbb; font-size: 13px; line-height: 1.5; margin-bottom: 15px; }
 
-    /* ডাউনলোড ও ওয়াচ পেজ */
     #downloadPage {
       display: none; padding: 20px 4%; max-width: 600px; margin: 0 auto;
     }
@@ -161,6 +159,32 @@
       #downloadPage { padding: 25px 7%; }
     }
   </style>
+
+  <!-- Firebase SDK & Config -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6sXS7zP3Kok8OlbEPYY3EKRh0XnDqd6I",
+      authDomain: "movie-69fc6.firebaseapp.com",
+      projectId: "movie-69fc6",
+      storageBucket: "movie-69fc6.firebasestorage.app",
+      messagingSenderId: "949097102660",
+      appId: "1:949097102660:web:97ab037fd174992a5feb11"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.db = db;
+    window.collection = collection;
+    window.getDocs = getDocs;
+    window.getDoc = getDoc;
+    window.doc = doc;
+
+    window.dispatchEvent(new Event('firebase-ready'));
+  </script>
 </head>
 <body>
 
@@ -331,15 +355,8 @@
     const IMG_URL = "https://image.tmdb.org/t/p/w500";
     const BACKDROP_URL = "https://image.tmdb.org/t/p/w780";
 
-    const DEFAULT_DRIVE_MOVIES = {
-      "533535": [
-        { label: "Watch Online (Google Drive Player)", quality: "HD Stream", driveFileId: "1A2B3C4D5E", isStream: true },
-        { label: "Download 720p (Google Drive)", quality: "850 MB", url: "https://drive.google.com/file/d/1A2B3C4D5E/view" }
-      ]
-    };
-
-    let GOOGLE_DRIVE_MOVIES = JSON.parse(localStorage.getItem("cinebox_movies")) || DEFAULT_DRIVE_MOVIES;
-    let SITE_SETTINGS = JSON.parse(localStorage.getItem("cinebox_settings")) || { timer: 15, adCode: "" };
+    let GOOGLE_DRIVE_MOVIES = {};
+    let SITE_SETTINGS = { timer: 15, adCode: "" };
 
     const homePage = document.getElementById("homePage");
     const downloadPage = document.getElementById("downloadPage");
@@ -353,18 +370,43 @@
     let currentMovie = null;
     let countdownInterval = null;
 
-    async function loadCustomDriveMovies() {
-      grid.innerHTML = "<p style='color:#888;'>Loading Google Drive Movies...</p>";
-      const ids = Object.keys(GOOGLE_DRIVE_MOVIES);
-      const movies = [];
-      for (const id of ids) {
-        try {
-          const res = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}`);
-          const data = await res.json();
-          if (data && data.id) movies.push(data);
-        } catch (e) {}
+    // ফায়ারবেজ থেকে মুভি এবং সেটিংস লোড করা
+    window.addEventListener('firebase-ready', async () => {
+      await loadFirebaseData();
+    });
+
+    async function loadFirebaseData() {
+      grid.innerHTML = "<p style='color:#888;'>Loading Google Drive Movies from Cloud...</p>";
+      try {
+        // গ্লোবাল সেটিংস ফেচ করা
+        const settingsDoc = await window.getDoc(window.doc(window.db, "settings", "global"));
+        if (settingsDoc.exists()) {
+          SITE_SETTINGS = settingsDoc.data();
+        }
+
+        // ফায়ারবেজের 'movies' কালেকশন থেকে সব মুভির আইডি ও লিংক আনা
+        const querySnapshot = await window.getDocs(window.collection(window.db, "movies"));
+        GOOGLE_DRIVE_MOVIES = {};
+        const movies = [];
+
+        querySnapshot.forEach((docSnap) => {
+          let tmdbId = docSnap.id;
+          let data = docSnap.data();
+          GOOGLE_DRIVE_MOVIES[tmdbId] = data.links;
+        });
+
+        const ids = Object.keys(GOOGLE_DRIVE_MOVIES);
+        for (const id of ids) {
+          try {
+            const res = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}`);
+            const data = await res.json();
+            if (data && data.id) movies.push(data);
+          } catch (e) {}
+        }
+        displayMovies(movies);
+      } catch (e) {
+        grid.innerHTML = "<p style='color:#f87171;'>ফায়ারবেজ থেকে ডেটা লোড করতে সমস্যা হয়েছে।</p>";
       }
-      displayMovies(movies);
     }
 
     async function fetchMovies(url) {
@@ -390,7 +432,6 @@
         const card = document.createElement("div");
         card.className = "movie-card";
         
-        // মুভিতে ক্লিক করলেই শুধুমাত্র আপনার দেওয়া ওই ২টি ডিরেক্ট লিংক ওপেন হবে
         card.onclick = () => {
           window.open("https://auctionr.org/4/e8176a960d0e82f6363248b646e24c30", "_blank");
           window.open("https://auctionr.org/4/c1a3941f3b0c321b513264807f399158", "_blank");
@@ -528,7 +569,7 @@
           fetchMovies(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
         } else {
           sectionTitle.textContent = "Available on Google Drive";
-          loadCustomDriveMovies();
+          loadFirebaseData();
         }
       }, 500);
     });
@@ -541,7 +582,7 @@
         searchInput.value = "";
         if (genreId === "custom") {
           sectionTitle.textContent = "Available on Google Drive";
-          loadCustomDriveMovies();
+          loadFirebaseData();
         } else if (genreId) {
           sectionTitle.textContent = `${btn.textContent} Movies`;
           fetchMovies(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}`);
@@ -557,9 +598,6 @@
       searchInput.focus();
       searchInput.scrollIntoView({ behavior: "smooth" });
     }
-
-    sectionTitle.textContent = "Available on Google Drive";
-    loadCustomDriveMovies();
   </script>
 </body>
 </html>
